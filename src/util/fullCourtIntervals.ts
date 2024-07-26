@@ -27,15 +27,15 @@ export default function findFullIntervals(intervals: any): AvailableTimeslot[] {
 
   if (halfCourtIntervals.length !== 0) {
     let currentInterval: timeInterval = halfCourtIntervals[0];
-    for (let i = 0; i < halfCourtIntervals.length; i++) {
+    for (let i = 1; i < halfCourtIntervals.length; i++) {
       const tmp = halfCourtIntervals[i];
       if (overlap(currentInterval, tmp)) {
         const newEnd = new Date(
           Math.max(currentInterval.res_end.getTime(), tmp.res_end.getTime()),
         );
         currentInterval = {
-          res_start: currentInterval.res_start,
-          res_end: newEnd,
+          res_start: new Date(currentInterval.res_start),
+          res_end: new Date(newEnd),
         };
       } else {
         filteredIntervals.push(currentInterval);
@@ -44,6 +44,7 @@ export default function findFullIntervals(intervals: any): AvailableTimeslot[] {
     }
     filteredIntervals.push(currentInterval);
   }
+
   filteredIntervals.sort(
     (interval1, interval2) =>
       interval1.res_start.getTime() - interval2.res_start.getTime(),
@@ -76,8 +77,6 @@ export default function findFullIntervals(intervals: any): AvailableTimeslot[] {
       endTime: finalDay,
     });
   }
-  console.log("FULL");
-  console.log(ret);
 
   return ret;
 }

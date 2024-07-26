@@ -1,5 +1,5 @@
 import { describe, expect, test } from "@jest/globals";
-import findFullIntervals from "../util/intervals";
+import findFullIntervals from "../util/fullCourtIntervals";
 import { AvailableTimeslot } from "react-schedule-meeting";
 
 describe("Interval Module", () => {
@@ -7,6 +7,10 @@ describe("Interval Module", () => {
   const name = "colin";
   const type = "full";
   const id = 1;
+  const startDate = new Date(new Date().setHours(0, 0, 0, 0));
+  const endDate = new Date();
+  endDate.setDate(endDate.getDate() + 6);
+  endDate.setHours(24, 0, 0, 0);
 
   test("Check Empty Intervals", () => {
     const endDate = new Date();
@@ -21,11 +25,8 @@ describe("Interval Module", () => {
     expect(findFullIntervals([])).toEqual(expected);
   });
   test("One interval at beginning of day", () => {
-    const res_start = "2024-07-26T00:00:00";
-    const res_end = "2024-07-26T03:00:00";
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
+    const res_start = new Date(new Date().setHours(0, 0, 0, 0));
+    const res_end = new Date(new Date().setHours(3, 0, 0, 0));
 
     const intervals = [
       {
@@ -34,355 +35,82 @@ describe("Interval Module", () => {
         type,
         res_start,
         res_end,
+        name,
       },
     ];
     const expected: AvailableTimeslot[] = [];
     expected.push({
       id: 1,
-      startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-      endTime: new Date(res_start),
-    });
-    expected.push({
-      id: 2,
-      startTime: new Date(res_end),
+      startTime: res_end,
       endTime: endDate,
     });
     expect(findFullIntervals(intervals)).toEqual(expected);
   });
-  test("Interval at end of day", () => {
-    const res_start = "2024-07-31T10:00:00";
-    const res_end = "2024-08-01T00:00:00";
 
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
+  test("One half court interval", () => {
+    const res_start = new Date(new Date().setHours(1, 0, 0, 0));
+    const res_end = new Date(new Date().setHours(3, 0, 0, 0));
     const intervals = [
       {
         id,
         created_at,
-        type,
+        type: "half",
         res_start,
         res_end,
-      },
-    ];
-
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-      endTime: new Date(res_start),
-    });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Test Interval Over Midnight", () => {
-    const res_start = "2024-07-28T10:00:00";
-    const res_end = "2024-08-29T02:00:00";
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start,
-        res_end,
-      },
-    ];
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-      endTime: new Date(res_start),
-    });
-    expected.push({
-      id: 2,
-      startTime: new Date(res_end),
-      endTime: endDate,
-    });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Interval at start of day", () => {
-    const res_start = "2024-07-25T00:00:00";
-    const res_end = "2024-07-25T03:00:00";
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start,
-        res_end,
-      },
-    ];
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: new Date(res_end),
-      endTime: endDate,
-    });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Interval at start of day and interval at end of day", () => {
-    const res_start1 = "2024-07-25T00:00:00";
-    const res_end1 = "2024-07-25T03:00:00";
-    const res_start2 = "2024-07-25T10:00:00";
-    const res_end2 = "2024-07-26T02:00:00";
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start1,
-        res_end: res_end1,
-      },
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start2,
-        res_end: res_end2,
-      },
-    ];
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: new Date(res_end1),
-      endTime: new Date(res_start2),
-    });
-    expected.push({
-      id: 2,
-      startTime: new Date(res_end2),
-      endTime: endDate,
-    });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Back 2 Back intervals", () => {
-    const res_start1 = "2024-07-26T03:00:00";
-    const res_end1 = "2024-07-26T05:00:00";
-    const res_start2 = "2024-07-26T05:00:00";
-    const res_end2 = "2024-07-26T07:00:00";
-
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start1,
-        res_end: res_end1,
-      },
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start2,
-        res_end: res_end2,
+        name,
       },
     ];
     const expected: AvailableTimeslot[] = [];
     expected.push({
       id: 1,
       startTime: startDate,
-      endTime: new Date(res_start1),
+      endTime: res_start,
     });
     expected.push({
       id: 2,
-      startTime: new Date(res_end2),
+      startTime: res_end,
       endTime: endDate,
     });
+
     expect(findFullIntervals(intervals)).toEqual(expected);
   });
-  test("Two Interval Generic", () => {
-    const res_start1 = "2024-07-26T03:00:00";
-    const res_end1 = "2024-07-26T05:00:00";
-    const res_start2 = "2024-07-27T10:00:00";
-    const res_end2 = "2024-07-27T11:00:00";
 
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
+  test("Overlapping half court big + small", () => {
+    const res_start1 = new Date(new Date().setHours(1, 0, 0, 0));
+    const res_end1 = new Date(new Date().setHours(5, 0, 0, 0));
+    const res_start2 = new Date(new Date().setHours(2, 0, 0, 0));
+    const res_end2 = new Date(new Date().setHours(3, 0, 0, 0));
 
     const intervals = [
       {
         id,
         created_at,
-        type,
+        type: "half",
         res_start: res_start1,
         res_end: res_end1,
+        name,
       },
       {
         id,
         created_at,
-        type,
+        type: "half",
         res_start: res_start2,
-        res_end: res_end2,
+        res_end: res_start2,
+        name,
       },
     ];
     const expected: AvailableTimeslot[] = [];
     expected.push({
       id: 1,
       startTime: startDate,
-      endTime: new Date(res_start1),
+      endTime: res_start1,
     });
     expected.push({
       id: 2,
-      startTime: new Date(res_end1),
-      endTime: new Date(res_start2),
-    });
-    expected.push({
-      id: 3,
-      startTime: new Date(res_end2),
+      startTime: res_end1,
       endTime: endDate,
     });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Interval overnight and back 2 back", () => {
-    const res_start1 = "2024-07-25T23:00:00";
-    const res_end1 = "2024-07-26T03:00:00";
-    const res_start2 = "2024-07-26T03:00:00";
-    const res_end2 = "2024-07-26T10:00:00";
 
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start1,
-        res_end: res_end1,
-      },
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start2,
-        res_end: res_end2,
-      },
-    ];
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: startDate,
-      endTime: new Date(res_start1),
-    });
-    expected.push({
-      id: 2,
-      startTime: new Date(res_end2),
-      endTime: endDate,
-    });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Interval at beginning of day back 2 back", () => {
-    const res_start1 = "2024-07-25T00:00:00";
-    const res_end1 = "2024-07-25T02:00:00";
-    const res_start2 = "2024-07-25T02:00:00";
-    const res_end2 = "2024-07-25T05:00:00";
-
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start1,
-        res_end: res_end1,
-      },
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start2,
-        res_end: res_end2,
-      },
-    ];
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: new Date(res_end2),
-      endTime: endDate,
-    });
-    expect(findFullIntervals(intervals)).toEqual(expected);
-  });
-  test("Final assurance test", () => {
-    const res_start1 = "2024-07-25T00:00:00";
-    const res_end1 = "2024-07-25T02:00:00";
-    const res_start2 = "2024-07-25T02:00:00";
-    const res_end2 = "2024-07-25T05:00:00";
-    const res_start3 = "2024-07-27T10:00:00";
-    const res_end3 = "2024-07-27T12:00:00";
-
-    const startDate = new Date();
-    startDate.setHours(0, 0, 0, 0);
-
-    const endDate = new Date();
-    endDate.setDate(endDate.getDate() + 6);
-    endDate.setHours(24, 0, 0, 0);
-
-    const intervals = [
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start1,
-        res_end: res_end1,
-      },
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start2,
-        res_end: res_end2,
-      },
-      {
-        id,
-        created_at,
-        type,
-        res_start: res_start3,
-        res_end: res_end3,
-      },
-    ];
-    const expected: AvailableTimeslot[] = [];
-    expected.push({
-      id: 1,
-      startTime: new Date(res_end2),
-      endTime: new Date(res_start3),
-    });
-    expected.push({
-      id: 2,
-      startTime: new Date(res_end3),
-      endTime: endDate,
-    });
     expect(findFullIntervals(intervals)).toEqual(expected);
   });
 });

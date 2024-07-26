@@ -80,7 +80,5 @@ export default function findHalfIntervals(
       endTime: finalDay,
     });
   }
-  console.log("HALF");
-  console.log(filteredIntervals);
   return ret;
 }
