@@ -95,7 +95,7 @@ describe("Interval Module", () => {
         created_at,
         type: "half",
         res_start: res_start2,
-        res_end: res_start2,
+        res_end: res_end2,
         name,
       },
     ];

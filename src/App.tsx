@@ -39,6 +39,23 @@ function App() {
   });
 
   useEffect(() => {
+    const fetchCheckoutSession = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke(
+          "checkoutSession",
+          {
+            body: { priceId: "price_1PhIRkRplLS2DMsTYTcBZRGT" },
+          },
+        );
+        console.log(data, error);
+      } catch (error: any) {
+        setFetchError(error.message);
+      }
+    };
+    fetchCheckoutSession();
+  }, []);
+
+  useEffect(() => {
     const fetchReservations = async () => {
       try {
         const today = new Date();
@@ -139,9 +156,7 @@ function App() {
                   style={{ pointerEvents: "auto" }}
                 />
               }
-              label={
-                resType === "full" ? "Full Court Times" : "Half Court Times"
-              }
+              label={resType === "full" ? "FULL COURT" : "HALF COURT"}
               style={{ pointerEvents: "none" }}
               sx={{
                 paddingY: "1em",
@@ -151,6 +166,8 @@ function App() {
                   borderWidth: "3px",
                   borderRadius: "5px",
                   borderColor: "#E57E31",
+                  fontWeight: "900",
+                  fontSize: "1.15em",
                   color: "white",
                 },
                 "& .MuiSwitch-switchBase.Mui-checked": {
