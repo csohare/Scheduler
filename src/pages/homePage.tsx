@@ -1,9 +1,10 @@
-import { supabase } from "./config/supabaseClient";
+import { supabase } from "../config/supabaseClient";
 import { useEffect, useLayoutEffect, useState } from "react";
-import findFullIntervals from "./util/fullCourtIntervals";
-import findHalfIntervals from "./util/halfCourtIntervals";
-import allowedTimes from "./util/allowedTimes";
-import { availableEnd } from "./util/allowedTimes";
+import { useNavigate } from "react-router-dom";
+import findFullIntervals from "../util/fullCourtIntervals";
+import findHalfIntervals from "../util/halfCourtIntervals";
+import allowedTimes from "../util/allowedTimes";
+import { availableEnd } from "../util/allowedTimes";
 import { ScheduleMeeting } from "react-schedule-meeting";
 import { AvailableTimeslot, StartTimeEvent } from "react-schedule-meeting";
 
@@ -22,9 +23,7 @@ import {
   alpha,
 } from "@mui/material";
 
-import "./index.css";
-
-function App() {
+export default function HomePage() {
   const [fullRes, setFullRes] = useState<AvailableTimeslot[]>([]);
   const [halfRes, setHalfRes] = useState<AvailableTimeslot[]>([]);
   const [startTime, setStartTime] = useState<Date>();
@@ -34,17 +33,24 @@ function App() {
   const [resType, setResType] = useState("full");
   const [loading, setLoading] = useState(true);
 
+  const navigate = useNavigate();
+
   useLayoutEffect(() => {
     document.body.style.backgroundColor = "#202020";
   });
 
+  /*
   useEffect(() => {
     const fetchCheckoutSession = async () => {
       try {
         const { data, error } = await supabase.functions.invoke(
           "checkoutSession",
           {
-            body: { priceId: "price_1PhIRkRplLS2DMsTYTcBZRGT" },
+            body: {
+              priceId: "price_1PhIRkRplLS2DMsTYTcBZRGT",
+              startTime: `${startTime?.toISOString()}`,
+              endTime: endTime,
+            },
           },
         );
         console.log(data, error);
@@ -53,7 +59,7 @@ function App() {
       }
     };
     fetchCheckoutSession();
-  }, []);
+  }, []); */
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -108,7 +114,24 @@ function App() {
 
   const handleFormSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(e);
+    const fetchCheckoutSession = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke(
+          "checkoutSession",
+          {
+            body: {
+              priceId: "price_1PhIRkRplLS2DMsTYTcBZRGT",
+              startTime: `${startTime?.toISOString()}`,
+              endTime: endTime,
+            },
+          },
+        );
+        console.log(data, error);
+      } catch (error: any) {
+        setFetchError(error.message);
+      }
+    };
+    navigate("/checkout", { state: { startTime, endTime } });
   };
 
   const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -306,4 +329,3 @@ function App() {
     </div>
   );
 }
-export default App;
