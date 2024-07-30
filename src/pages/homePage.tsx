@@ -1,13 +1,12 @@
 import { supabase } from "../config/supabaseClient";
 import { useEffect, useLayoutEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import findFullIntervals from "../util/fullCourtIntervals";
 import findHalfIntervals from "../util/halfCourtIntervals";
 import allowedTimes from "../util/allowedTimes";
 import { availableEnd } from "../util/allowedTimes";
 import { ScheduleMeeting } from "react-schedule-meeting";
 import { AvailableTimeslot, StartTimeEvent } from "react-schedule-meeting";
-
+import { Check } from "@mui/icons-material";
 import {
   CircularProgress,
   FormControl,
@@ -20,6 +19,8 @@ import {
   Box,
   Switch,
   FormControlLabel,
+  Backdrop,
+  Alert,
   alpha,
 } from "@mui/material";
 
@@ -33,33 +34,12 @@ export default function HomePage() {
   const [resType, setResType] = useState("full");
   const [loading, setLoading] = useState(true);
 
-  const navigate = useNavigate();
+  const [success, setSuccess] = useState(false);
+  const [message, setMessage] = useState("");
 
   useLayoutEffect(() => {
     document.body.style.backgroundColor = "#202020";
   });
-
-  /*
-  useEffect(() => {
-    const fetchCheckoutSession = async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke(
-          "checkoutSession",
-          {
-            body: {
-              priceId: "price_1PhIRkRplLS2DMsTYTcBZRGT",
-              startTime: `${startTime?.toISOString()}`,
-              endTime: endTime,
-            },
-          },
-        );
-        console.log(data, error);
-      } catch (error: any) {
-        setFetchError(error.message);
-      }
-    };
-    fetchCheckoutSession();
-  }, []); */
 
   useEffect(() => {
     const fetchReservations = async () => {
@@ -92,7 +72,23 @@ export default function HomePage() {
     };
     const timeoutId = setTimeout(() => {
       fetchReservations();
-    }, 1000);
+
+      const query = new URLSearchParams(window.location.search);
+      const res = query.get("success");
+
+      if (res === "true") {
+        setSuccess(true);
+        setMessage(
+          "Reservation created! You will receive an email confirmation soon. Thank you for booking with us!",
+        );
+      }
+      if (res === "false") {
+        setSuccess(false);
+        setMessage(
+          "Order canceled or failed. Try booking again or contact owner to make reservation",
+        );
+      }
+    }, 500);
 
     return () => {
       clearTimeout(timeoutId);
@@ -114,24 +110,23 @@ export default function HomePage() {
 
   const handleFormSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const fetchCheckoutSession = async () => {
-      try {
-        const { data, error } = await supabase.functions.invoke(
-          "checkoutSession",
-          {
-            body: {
-              priceId: "price_1PhIRkRplLS2DMsTYTcBZRGT",
-              startTime: `${startTime?.toISOString()}`,
-              endTime: endTime,
-            },
-          },
-        );
-        console.log(data, error);
-      } catch (error: any) {
-        setFetchError(error.message);
-      }
-    };
-    navigate("/checkout", { state: { startTime, endTime } });
+    fetch(
+      "https://fkwmyteahamhgaqsxetp.supabase.co/functions/v1/checkoutSession",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          startTime: `${startTime?.toLocaleString()}`,
+          endTime: `${new Date(endTime).toLocaleString()}`,
+          resType,
+        }),
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          "Content-Type": "application/json",
+        },
+      },
+    )
+      .then((res) => res.json())
+      .then((data) => (window.location.href = data.url));
   };
 
   const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,6 +150,10 @@ export default function HomePage() {
     );
   });
 
+  const alertMessage = (
+    <Alert severity={success ? "success" : "error"}>{message}</Alert>
+  );
+
   return (
     <div className="container flex flex-col mx-auto mt-1 h-screen justify-start align-middle">
       {loading ? (
@@ -169,6 +168,7 @@ export default function HomePage() {
         </div>
       ) : (
         <div>
+          {message && alertMessage}
           <div className="pl-5 pt-5">
             <FormControlLabel
               className="scale-125"
@@ -251,7 +251,6 @@ export default function HomePage() {
                 fullWidth
                 margin="normal"
                 focused
-                //disabled={startTime ? false : true}
                 sx={{
                   "& .MuiSelect-icon.Mui-disabled": {
                     color: "#E57E31",
@@ -290,7 +289,7 @@ export default function HomePage() {
                     },
                   }}
                   MenuProps={{
-                    className: "scale-110",
+                    className: "scale-x-110",
                   }}
                 >
                   {renderedEndTimes}

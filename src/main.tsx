@@ -4,20 +4,19 @@ import ReactDOM from "react-dom/client";
 import HomePage from "./pages/homePage";
 import CheckoutPage from "./pages/checkoutPage";
 import ReturnPage from "./pages/returnPage";
+import Root from "./components/root";
 import "./index.css";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
-  },
-  {
-    path: "/checkout",
-    element: <CheckoutPage />,
-  },
-  {
-    path: "/return",
-    element: <ReturnPage />,
+    element: <Root />,
+    children: [
+      {
+        path: "",
+        element: <HomePage />,
+      },
+    ],
   },
 ]);
 
