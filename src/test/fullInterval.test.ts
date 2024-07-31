@@ -1,6 +1,7 @@
 import { describe, expect, test } from "@jest/globals";
 import findFullIntervals from "../util/fullCourtIntervals";
 import { AvailableTimeslot } from "react-schedule-meeting";
+import { Tables } from "../util/types/supabaseTypes";
 
 describe("Interval Module", () => {
   const created_at = new Date().toISOString();
@@ -28,13 +29,13 @@ describe("Interval Module", () => {
     const res_start = new Date(new Date().setHours(0, 0, 0, 0));
     const res_end = new Date(new Date().setHours(3, 0, 0, 0));
 
-    const intervals = [
+    const intervals: Tables<"reservation">[] = [
       {
         id,
         created_at,
         type,
-        res_start,
-        res_end,
+        res_start: res_start.toLocaleString(),
+        res_end: res_end.toLocaleString(),
         name,
       },
     ];
@@ -55,8 +56,8 @@ describe("Interval Module", () => {
         id,
         created_at,
         type: "half",
-        res_start,
-        res_end,
+        res_start: res_start.toLocaleString(),
+        res_end: res_end.toLocaleString(),
         name,
       },
     ];
@@ -81,21 +82,21 @@ describe("Interval Module", () => {
     const res_start2 = new Date(new Date().setHours(2, 0, 0, 0));
     const res_end2 = new Date(new Date().setHours(3, 0, 0, 0));
 
-    const intervals = [
+    const intervals: Tables<"reservation">[] = [
       {
         id,
         created_at,
         type: "half",
-        res_start: res_start1,
-        res_end: res_end1,
+        res_start: res_start1.toLocaleString(),
+        res_end: res_end1.toLocaleString(),
         name,
       },
       {
         id,
         created_at,
         type: "half",
-        res_start: res_start2,
-        res_end: res_end2,
+        res_start: res_start2.toLocaleString(),
+        res_end: res_end2.toLocaleString(),
         name,
       },
     ];

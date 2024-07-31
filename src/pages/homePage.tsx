@@ -1,12 +1,13 @@
-import { supabase } from "../config/supabaseClient";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import findFullIntervals from "../util/fullCourtIntervals";
 import findHalfIntervals from "../util/halfCourtIntervals";
 import allowedTimes from "../util/allowedTimes";
+import { fetchReservations } from "../api/reservationQuery";
+import { fetchCheckoutSession } from "../api/checkoutSessionQuery";
 import { availableEnd } from "../util/allowedTimes";
 import { ScheduleMeeting } from "react-schedule-meeting";
 import { AvailableTimeslot, StartTimeEvent } from "react-schedule-meeting";
-import { Check } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 import {
   CircularProgress,
   FormControl,
@@ -19,7 +20,6 @@ import {
   Box,
   Switch,
   FormControlLabel,
-  Backdrop,
   Alert,
   alpha,
 } from "@mui/material";
@@ -30,48 +30,25 @@ export default function HomePage() {
   const [startTime, setStartTime] = useState<Date>();
   const [endTime, setEndTime] = useState<string>("");
   const [endTimes, setEndTimes] = useState<availableEnd[]>([]);
-  const [fetchError, setFetchError] = useState(null);
   const [resType, setResType] = useState("full");
   const [loading, setLoading] = useState(true);
-
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
 
-  useLayoutEffect(() => {
-    document.body.style.backgroundColor = "#202020";
-  });
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchReservations = async () => {
-      try {
-        const today = new Date();
-        const week = new Date(today);
-        week.setDate(today.getDate() + 6);
-
-        const fToday = today.toISOString().split("T")[0];
-        const fWeek = week.toISOString().split("T")[0];
-
-        const { data, error } = await supabase
-          .from("reservation")
-          .select()
-          .order("res_start", { ascending: true })
-          .gte("res_start", fToday)
-          .lte("res_end", fWeek);
-
-        if (error) {
-          throw error;
-        } else {
-          setFetchError(null);
-          setFullRes(() => findFullIntervals(data));
-          setHalfRes(() => findHalfIntervals(data));
-        }
-        setLoading(false);
-      } catch (error: any) {
-        setFetchError(error.message);
-      }
-    };
     const timeoutId = setTimeout(() => {
-      fetchReservations();
+      fetchReservations()
+        .then((data) => {
+          setFullRes(() => findFullIntervals(data!));
+          setHalfRes(() => findHalfIntervals(data!));
+          setLoading(false);
+        })
+        .catch((error) => {
+          setLoading(false);
+          navigate("/error", { state: { error } });
+        });
 
       const query = new URLSearchParams(window.location.search);
       const res = query.get("success");
@@ -85,7 +62,7 @@ export default function HomePage() {
       if (res === "false") {
         setSuccess(false);
         setMessage(
-          "Order canceled or failed. Try booking again or contact owner to make reservation",
+          "Order canceled or failed. Try booking again. If problem persists contact damon@theboombase.com for more information.",
         );
       }
     }, 500);
@@ -110,23 +87,12 @@ export default function HomePage() {
 
   const handleFormSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    fetch(
-      "https://fkwmyteahamhgaqsxetp.supabase.co/functions/v1/checkoutSession",
-      {
-        method: "POST",
-        body: JSON.stringify({
-          startTime: `${startTime?.toLocaleString()}`,
-          endTime: `${new Date(endTime).toLocaleString()}`,
-          resType,
-        }),
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          "Content-Type": "application/json",
-        },
-      },
-    )
-      .then((res) => res.json())
-      .then((data) => (window.location.href = data.url));
+    setLoading(true);
+    fetchCheckoutSession(startTime!, endTime, resType)
+      .then((data) => (window.location.href = data.url))
+      .catch((error) => {
+        navigate("/error", { state: { error } });
+      });
   };
 
   const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -151,7 +117,15 @@ export default function HomePage() {
   });
 
   const alertMessage = (
-    <Alert severity={success ? "success" : "error"}>{message}</Alert>
+    <Alert
+      className="mx-3"
+      severity={success ? "success" : "error"}
+      onClose={() => {
+        setMessage("");
+      }}
+    >
+      {message}
+    </Alert>
   );
 
   return (
@@ -179,7 +153,11 @@ export default function HomePage() {
                   style={{ pointerEvents: "auto" }}
                 />
               }
-              label={resType === "full" ? "FULL COURT" : "HALF COURT"}
+              label={
+                resType === "full"
+                  ? "FULL COURT | $150/h"
+                  : "HALF COURT | $75/h"
+              }
               style={{ pointerEvents: "none" }}
               sx={{
                 paddingY: "1em",
@@ -208,7 +186,7 @@ export default function HomePage() {
           <ScheduleMeeting
             borderRadius={25}
             primaryColor="#E57E31"
-            backgroundColor="#27272a"
+            backgroundColor="#333333"
             eventDurationInMinutes={60}
             availableTimeslots={resType === "full" ? fullRes : halfRes}
             startTimeListStyle="scroll-list"

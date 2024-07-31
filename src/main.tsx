@@ -2,8 +2,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import HomePage from "./pages/homePage";
-import CheckoutPage from "./pages/checkoutPage";
-import ReturnPage from "./pages/returnPage";
+import ErrorPage from "./pages/errorPage";
+import ErrorBoundary from "./pages/errorBoundary";
 import Root from "./components/root";
 import "./index.css";
 
@@ -16,7 +16,12 @@ const router = createBrowserRouter([
         path: "",
         element: <HomePage />,
       },
+      {
+        path: "/error",
+        element: <ErrorPage />,
+      },
     ],
+    errorElement: <ErrorBoundary />,
   },
 ]);
 

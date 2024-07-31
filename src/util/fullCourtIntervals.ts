@@ -1,29 +1,38 @@
 import { AvailableTimeslot } from "react-schedule-meeting";
+import { Tables } from "../util/types/supabaseTypes";
 import { timeInterval } from "./types/timeInterval";
 import overlap from "./overlap";
 
-export default function findFullIntervals(intervals: any): AvailableTimeslot[] {
+export default function findFullIntervals(
+  intervals: Tables<"reservation">[],
+): AvailableTimeslot[] {
   const ret: AvailableTimeslot[] = [];
 
-  const filteredIntervals: timeInterval[] = intervals.reduce((acc, item) => {
-    if (item.type === "full") {
-      acc.push({
-        res_start: new Date(item.res_start),
-        res_end: new Date(item.res_end),
-      });
-    }
-    return acc;
-  }, []);
+  const filteredIntervals: timeInterval[] = intervals.reduce(
+    (acc: timeInterval[], item) => {
+      if (item.type === "full") {
+        acc.push({
+          res_start: new Date(item.res_start),
+          res_end: new Date(item.res_end),
+        });
+      }
+      return acc;
+    },
+    [],
+  );
 
-  const halfCourtIntervals: timeInterval[] = intervals.reduce((acc, item) => {
-    if (item.type === "half") {
-      acc.push({
-        res_start: new Date(item.res_start),
-        res_end: new Date(item.res_end),
-      });
-    }
-    return acc;
-  }, []);
+  const halfCourtIntervals: timeInterval[] = intervals.reduce(
+    (acc: timeInterval[], item) => {
+      if (item.type === "half") {
+        acc.push({
+          res_start: new Date(item.res_start),
+          res_end: new Date(item.res_end),
+        });
+      }
+      return acc;
+    },
+    [],
+  );
 
   if (halfCourtIntervals.length !== 0) {
     let currentInterval: timeInterval = halfCourtIntervals[0];
