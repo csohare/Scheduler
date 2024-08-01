@@ -1,15 +1,12 @@
 import { useLayoutEffect } from "react";
-import { useNavigate, useRouteError } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export default function ErrorBoundary() {
-  const error = useRouteError();
   const navigate = useNavigate();
 
   useLayoutEffect(() => {
     document.body.style.backgroundColor = "#222222";
   });
-
-  console.log(error);
 
   return (
     <div className="flex flex-col h-screen justify-center items-center text-white">

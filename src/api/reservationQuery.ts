@@ -2,6 +2,8 @@ import { supabase } from "../config/supabaseClient";
 
 export const fetchReservations = async () => {
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
   const week = new Date(today);
   week.setDate(today.getDate() + 6);
 
@@ -12,12 +14,12 @@ export const fetchReservations = async () => {
     .from("reservation")
     .select()
     .order("res_start", { ascending: true })
-    .gte("res_start", formattedToday)
+    .gte("res_end", formattedToday)
     .lte("res_end", formattedWeek);
 
   if (data) {
     return data;
   } else if (error) {
-    throw new Error(error.message);
+    throw new Error("Fetch Error");
   }
 };

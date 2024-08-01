@@ -79,6 +79,7 @@ export default function HomePage() {
       ) / 3.6e6;
     setStartTime(event.startTime);
     setEndTimes(allowedTimes(event.startTime, hours));
+    setEndTime("");
   };
 
   const handleEndTimeChange = (event: SelectChangeEvent) => {
@@ -154,9 +155,7 @@ export default function HomePage() {
                 />
               }
               label={
-                resType === "full"
-                  ? "FULL COURT | $150/h"
-                  : "HALF COURT | $75/h"
+                resType === "full" ? "FULL COURT $150/h" : "HALF COURT $75/h"
               }
               style={{ pointerEvents: "none" }}
               sx={{
@@ -193,10 +192,10 @@ export default function HomePage() {
             onStartTimeSelect={handleOnStartTimeSelect}
             selectedStartTime={startTime}
           />
-          <div className="mx-24">
+          <div className="mx-5">
             <form onSubmit={handleFormSubmit}>
               <TextField
-                className="scale-110"
+                className=""
                 value={
                   startTime
                     ? `${startTime?.toDateString()} ${startTime?.toLocaleTimeString()}`
@@ -210,7 +209,7 @@ export default function HomePage() {
                   readOnly: true,
                 }}
                 fullWidth
-                margin="dense"
+                margin="normal"
                 sx={{
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
@@ -225,7 +224,8 @@ export default function HomePage() {
                 }}
               />
               <FormControl
-                className="scale-110"
+                className={`w-full ${startTime && !endTime && "animate-bounce"}`}
+                disabled={!startTime ? true : false}
                 fullWidth
                 margin="normal"
                 focused
@@ -238,7 +238,7 @@ export default function HomePage() {
                   },
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
-                      borderColor: "#E57E31",
+                      borderColor: `${startTime && !endTime ? "white" : "#E57E31"}`,
                     },
                   "& .MuiInputLabel-root.Mui-focused": {
                     color: "#E57E31",
@@ -246,6 +246,7 @@ export default function HomePage() {
                 }}
               >
                 <InputLabel
+                  className="pl-3"
                   id="end_label"
                   sx={{
                     "& .MuiInputLabel-root.Mui-focused": {
@@ -267,7 +268,7 @@ export default function HomePage() {
                     },
                   }}
                   MenuProps={{
-                    className: "scale-x-110",
+                    className: "",
                   }}
                 >
                   {renderedEndTimes}
@@ -291,6 +292,7 @@ export default function HomePage() {
                 }}
               >
                 <Button
+                  className={`${endTime && "animate-pulse"}`}
                   variant="contained"
                   type="submit"
                   size="large"
