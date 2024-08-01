@@ -20,8 +20,13 @@ export const fetchCheckoutSession = async (
         },
       },
     );
-    return await response.json();
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("Failed to create checkout session");
+    }
   } catch (error) {
+    console.log(error);
     throw new Error("Error Fetching Checkout Session");
   }
 };

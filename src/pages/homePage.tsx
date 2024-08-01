@@ -32,6 +32,7 @@ export default function HomePage() {
   const [endTimes, setEndTimes] = useState<availableEnd[]>([]);
   const [resType, setResType] = useState("full");
   const [loading, setLoading] = useState(true);
+  const [csLoading, setCsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -65,6 +66,12 @@ export default function HomePage() {
           "Order canceled or failed. Try booking again. If problem persists contact damon@theboombase.com for more information.",
         );
       }
+      if (res === "overlap") {
+        setSuccess(false);
+        setMessage(
+          "Reservation overlaps with another. Please try booking another time!",
+        );
+      }
     }, 500);
 
     return () => {
@@ -88,11 +95,20 @@ export default function HomePage() {
 
   const handleFormSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setCsLoading(true);
     fetchCheckoutSession(startTime!, endTime, resType)
-      .then((data) => (window.location.href = data.url))
+      .then((data) => {
+        console.log(data);
+        window.location.href = data.url;
+      })
       .catch((error) => {
-        navigate("/error", { state: { error } });
+        console.log(error);
+        window.location.href =
+          "http://" +
+          window.location.host +
+          window.location.pathname +
+          "?success=overlap";
+        //navigate("/error", { state: { error } });
       });
   };
 
@@ -231,17 +247,17 @@ export default function HomePage() {
                 focused
                 sx={{
                   "& .MuiSelect-icon.Mui-disabled": {
-                    color: "#E57E31",
+                    color: "white",
                   },
                   "& .MuiSelect-icon": {
-                    color: "#E57E31",
+                    color: `${startTime && !endTime ? "white" : "#E57E31"}`,
                   },
                   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
                     {
                       borderColor: `${startTime && !endTime ? "white" : "#E57E31"}`,
                     },
                   "& .MuiInputLabel-root.Mui-focused": {
-                    color: "#E57E31",
+                    color: `${startTime && !endTime ? "white" : "#E57E31"}`,
                   },
                 }}
               >
@@ -279,6 +295,9 @@ export default function HomePage() {
                 className="mt-4 scale-125"
                 textAlign="center"
                 sx={{
+                  "& .MuiCircularProgress-root": {
+                    color: "white",
+                  },
                   "& .MuiButton-root.Mui-disabled": {
                     color: "#949494",
                   },
@@ -296,9 +315,16 @@ export default function HomePage() {
                   variant="contained"
                   type="submit"
                   size="large"
-                  disabled={endTime ? false : true}
+                  disabled={endTime && !csLoading ? false : true}
                 >
                   Create Reservation
+                  {csLoading && (
+                    <CircularProgress
+                      className="ml-3"
+                      size={20}
+                      thickness={4}
+                    />
+                  )}
                 </Button>
               </Box>
             </form>
