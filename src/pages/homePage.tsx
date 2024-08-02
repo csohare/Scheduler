@@ -84,7 +84,7 @@ export default function HomePage() {
       clearTimeout(timeoutId);
       window.removeEventListener("popstate", handlePopState);
     };
-  }, []);
+  }, [navigate]);
 
   const handleOnStartTimeSelect = (event: StartTimeEvent) => {
     const hours =
