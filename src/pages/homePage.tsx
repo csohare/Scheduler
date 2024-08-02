@@ -39,6 +39,12 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const handlePopState = () => {
+      window.location.reload();
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
     const timeoutId = setTimeout(() => {
       fetchReservations()
         .then((data) => {
@@ -76,6 +82,7 @@ export default function HomePage() {
 
     return () => {
       clearTimeout(timeoutId);
+      window.removeEventListener("popstate", handlePopState);
     };
   }, []);
 
