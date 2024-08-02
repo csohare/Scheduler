@@ -43,9 +43,6 @@ export default function HomePage() {
       window.location.reload();
     };
 
-    window.addEventListener("popstate", handlePopState);
-    window.addEventListener("pageshow", handlePopState);
-
     const timeoutId = setTimeout(() => {
       fetchReservations()
         .then((data) => {
@@ -83,7 +80,6 @@ export default function HomePage() {
 
     return () => {
       clearTimeout(timeoutId);
-      window.removeEventListener("popstate", handlePopState);
     };
   }, [navigate]);
 
