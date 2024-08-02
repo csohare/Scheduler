@@ -44,6 +44,7 @@ export default function HomePage() {
     };
 
     window.addEventListener("popstate", handlePopState);
+    window.addEventListener("pageshow", handlePopState);
 
     const timeoutId = setTimeout(() => {
       fetchReservations()
