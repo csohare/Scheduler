@@ -39,10 +39,6 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handlePopState = () => {
-      window.location.reload();
-    };
-
     const timeoutId = setTimeout(() => {
       fetchReservations()
         .then((data) => {
