@@ -207,6 +207,7 @@ export default function HomePage() {
             startTimeListStyle="scroll-list"
             onStartTimeSelect={handleOnStartTimeSelect}
             selectedStartTime={startTime}
+            skipConfirmCheck={true}
           />
           <div className="mx-5">
             <form onSubmit={handleFormSubmit}>
