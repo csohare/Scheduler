@@ -39,6 +39,14 @@ export default function HomePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const handlePageHide = () => {
+      window.addEventListener("pageshow", () => {
+        window.location.reload();
+      });
+    };
+
+    window.addEventListener("pagehide", handlePageHide);
+
     const timeoutId = setTimeout(() => {
       fetchReservations()
         .then((data) => {
@@ -75,6 +83,7 @@ export default function HomePage() {
     }, 500);
 
     return () => {
+      window.removeEventListener("pagehide", handlePageHide);
       clearTimeout(timeoutId);
     };
   }, [navigate]);
