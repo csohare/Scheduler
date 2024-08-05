@@ -3,6 +3,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import HomePage from "./pages/homePage";
 import ErrorPage from "./pages/errorPage";
+import Dashboard from "./pages/dashboard";
 import ErrorBoundary from "./pages/errorBoundary";
 import Root from "./components/root";
 import "./index.css";
@@ -19,6 +20,10 @@ const router = createBrowserRouter([
       {
         path: "error",
         element: <ErrorPage />,
+      },
+      {
+        path: "dashboard",
+        element: <Dashboard />,
       },
     ],
     errorElement: <ErrorBoundary />,
