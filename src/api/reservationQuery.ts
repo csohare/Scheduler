@@ -15,7 +15,7 @@ export const fetchReservations = async () => {
     .select()
     .order("res_start", { ascending: true })
     .gte("res_end", formattedToday)
-    .lte("res_end", formattedWeek);
+    .lte("res_start", formattedWeek);
 
   if (data) {
     return data;
