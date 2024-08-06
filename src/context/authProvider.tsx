@@ -7,6 +7,7 @@ import {
 } from "react";
 import { supabase } from "../config/supabaseClient";
 import { Session } from "@supabase/supabase-js";
+import { useNavigate } from "react-router-dom";
 
 type AuthProviderProps = {
   children: ReactNode;
@@ -36,7 +37,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log(`SUPABSE AUTH EVENT ${event}`);
       setSession(session);
     });
 
