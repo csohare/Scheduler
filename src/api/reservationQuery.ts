@@ -1,14 +1,9 @@
 import { supabase } from "../config/supabaseClient";
 
-export const fetchReservations = async () => {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const week = new Date(today);
-  week.setDate(today.getDate() + 6);
-
-  const formattedToday = today.toISOString().split("T")[0];
-  const formattedWeek = week.toISOString().split("T")[0];
+export const fetchReservations = async (startTime: Date, endTime: Date) => {
+  const formattedToday = startTime.toISOString().split("T")[0];
+  const formattedWeek = endTime.toISOString().split("T")[0];
+  console.log(formattedToday, formattedWeek);
 
   const { data, error } = await supabase
     .from("reservation")

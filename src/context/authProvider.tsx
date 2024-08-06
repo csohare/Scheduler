@@ -50,7 +50,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://scheduler-delta.vercel.app",
+        //redirectTo: "https://scheduler-delta.vercel.app",
+        redirectTo: window.location.origin,
       },
     });
     console.log(data, error);

@@ -44,11 +44,15 @@ export default function HomePage() {
         window.location.reload();
       });
     };
-
     window.addEventListener("pagehide", handlePageHide);
 
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const week = new Date(today);
+    week.setDate(today.getDate() + 11);
+
     const timeoutId = setTimeout(() => {
-      fetchReservations()
+      fetchReservations(today, week)
         .then((data) => {
           setFullRes(() => findFullIntervals(data!));
           setHalfRes(() => findHalfIntervals(data!));

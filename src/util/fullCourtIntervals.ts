@@ -60,7 +60,7 @@ export default function findFullIntervals(
   );
 
   const finalDay = new Date();
-  finalDay.setDate(finalDay.getDate() + 6);
+  finalDay.setDate(finalDay.getDate() + 11);
   finalDay.setHours(24, 0, 0, 0);
 
   let currentTime = new Date(new Date().setHours(0, 0, 0, 0));

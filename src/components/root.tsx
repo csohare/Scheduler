@@ -49,7 +49,7 @@ export default function Root() {
         </AppBar>
       </Box>
       <img
-        className="transition ease-in-out scale-125 select-none mx-auto mt-3"
+        className="transition ease-in-out select-none mx-auto mt-3"
         src="/logo.png"
       />
       <Outlet />
