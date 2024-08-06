@@ -7,7 +7,6 @@ import {
 } from "react";
 import { supabase } from "../config/supabaseClient";
 import { Session } from "@supabase/supabase-js";
-import { useNavigate } from "react-router-dom";
 
 type AuthProviderProps = {
   children: ReactNode;
