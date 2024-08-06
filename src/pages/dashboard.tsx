@@ -1,28 +1,16 @@
-import { supabase } from "../config/supabaseClient";
+import { useNavigate } from "react-router-dom";
 import { AuthContextType, useAuth } from "../context/authProvider";
+import { useEffect } from "react";
 
 export default function Dashboard() {
-  const { session, signIn } = useAuth() as AuthContextType;
+  const { session } = useAuth() as AuthContextType;
+  const navigate = useNavigate();
 
-  const handleSignOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      alert(error);
+  useEffect(() => {
+    if (!session || session?.user.role !== "service_role") {
+      navigate("/");
     }
-  };
+  }, []);
 
-  return !session || session?.user.role !== "service_role" ? (
-    <div className="container mx-auto">
-      <button onClick={signIn}>Sign In</button>
-    </div>
-  ) : (
-    <div className="flex">
-      <button
-        className="text-white outline-white mx-auto"
-        onClick={handleSignOut}
-      >
-        SIGNOUT
-      </button>
-    </div>
-  );
+  return <div>TODO: DASHBOARD STUFF</div>;
 }
