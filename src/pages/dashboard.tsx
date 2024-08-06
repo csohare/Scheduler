@@ -12,5 +12,7 @@ export default function Dashboard() {
     }
   }, []);
 
-  return <div>TODO: DASHBOARD STUFF</div>;
+  return (
+    <div className="flex text-white justify-center">TODO: DASHBOARD STUFF</div>
+  );
 }
