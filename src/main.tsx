@@ -35,10 +35,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <AuthProvider>
+    <AuthProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
         <RouterProvider router={router} />
-      </AuthProvider>
-    </LocalizationProvider>
+      </LocalizationProvider>
+    </AuthProvider>
   </React.StrictMode>,
 );

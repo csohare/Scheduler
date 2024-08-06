@@ -48,10 +48,6 @@ export default function Root() {
           </Toolbar>
         </AppBar>
       </Box>
-      <img
-        className="transition ease-in-out select-none mx-auto mt-3"
-        src="/logo.png"
-      />
       <Outlet />
     </div>
     /*

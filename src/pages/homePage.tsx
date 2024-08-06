@@ -23,6 +23,7 @@ import {
   Alert,
   alpha,
 } from "@mui/material";
+import { AuthContextType, useAuth } from "../context/authProvider";
 
 export default function HomePage() {
   const [fullRes, setFullRes] = useState<AvailableTimeslot[]>([]);
@@ -62,7 +63,6 @@ export default function HomePage() {
           setLoading(false);
           navigate("/error", { state: { error } });
         });
-
       const query = new URLSearchParams(window.location.search);
       const res = query.get("success");
 
@@ -157,6 +157,8 @@ export default function HomePage() {
       {message}
     </Alert>
   );
+
+  console.log(fullRes);
 
   return (
     <div className="container flex flex-col mx-auto mt-1 h-screen justify-start align-middle">
@@ -306,6 +308,7 @@ export default function HomePage() {
               </FormControl>
 
               <Box
+                marginBottom="2rem"
                 className="mt-4 scale-125"
                 textAlign="center"
                 sx={{
