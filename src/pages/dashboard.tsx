@@ -10,7 +10,7 @@ export default function Dashboard() {
     if (!session || session?.user.role !== "service_role") {
       navigate("/");
     }
-  }, []);
+  }, [session, navigate]);
 
   return (
     <div className="flex text-white justify-center">TODO: DASHBOARD STUFF</div>
