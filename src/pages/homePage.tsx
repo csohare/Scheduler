@@ -23,7 +23,6 @@ import {
   Alert,
   alpha,
 } from "@mui/material";
-import { AuthContextType, useAuth } from "../context/authProvider";
 
 export default function HomePage() {
   const [fullRes, setFullRes] = useState<AvailableTimeslot[]>([]);
