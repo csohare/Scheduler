@@ -321,7 +321,6 @@ export default function HomePage() {
                 }}
               >
                 <Button
-                  className={`${endTime && "animate-spin"}`}
                   variant="contained"
                   type="submit"
                   size="large"
