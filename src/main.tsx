@@ -2,6 +2,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import HomePage from "./pages/homePage";
+import { AuthProvider } from "./context/authProvider";
 import ErrorPage from "./pages/errorPage";
 import Dashboard from "./pages/dashboard";
 import ErrorBoundary from "./pages/errorBoundary";
@@ -10,7 +11,7 @@ import "./index.css";
 
 const router = createBrowserRouter([
   {
-    path: "/*",
+    path: "/",
     element: <Root />,
     children: [
       {
@@ -32,6 +33,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>,
 );
