@@ -18,10 +18,7 @@ import {
   TextField,
   Button,
   Box,
-  Switch,
-  FormControlLabel,
   Alert,
-  alpha,
 } from "@mui/material";
 
 export default function HomePage() {
@@ -99,6 +96,10 @@ export default function HomePage() {
     setStartTime(event.startTime);
     setEndTimes(allowedTimes(event.startTime, hours));
     setEndTime("");
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
   };
 
   const handleEndTimeChange = (event: SelectChangeEvent) => {
@@ -122,16 +123,6 @@ export default function HomePage() {
           "?success=overlap";
         //navigate("/error", { state: { error } });
       });
-  };
-
-  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked === false) {
-      setResType("half");
-    } else {
-      setResType("full");
-    }
-    setStartTime(undefined);
-    setEndTime("");
   };
 
   const renderedEndTimes = endTimes.map((endTime) => {
@@ -174,44 +165,50 @@ export default function HomePage() {
       ) : (
         <div>
           {message && alertMessage}
-          <div className="pl-5 pt-5">
-            <FormControlLabel
-              className="scale-125"
-              control={
-                <Switch
-                  defaultChecked
-                  onChange={handleSwitchChange}
-                  style={{ pointerEvents: "auto" }}
-                />
-              }
-              label={
-                resType === "full" ? "FULL COURT $150/h" : "HALF COURT $75/h"
-              }
-              style={{ pointerEvents: "none" }}
-              sx={{
-                paddingY: "1em",
-                paddingLeft: "1em",
-                "& .MuiTypography-root": {
-                  padding: "7px",
-                  borderWidth: "3px",
-                  borderRadius: "5px",
-                  borderColor: "#E57E31",
-                  fontWeight: "900",
-                  fontSize: "1.15em",
-                  color: "white",
-                },
-                "& .MuiSwitch-switchBase.Mui-checked": {
-                  color: "#E57E31",
-                  "&:hover": {
-                    backgroundColor: alpha("#E57E31", 0.1),
-                  },
-                },
-                "& .MuiSwitch-switchBase.Mui-checked+.MuiSwitch-track": {
-                  backgroundColor: "#E57E31",
-                },
+          <Box
+            display="flex"
+            alignItems="flex-end"
+            justifyContent="center"
+            borderBottom="3px solid white"
+            marginTop={6}
+            marginBottom={1}
+            marginX={3}
+          >
+            <Button
+              onClick={() => {
+                setResType("full");
+                setStartTime(undefined);
+                setEndTime("");
               }}
-            />
-          </div>
+              size="large"
+              sx={{
+                backgroundColor: `${resType === "full" ? "white" : "transparent"}`,
+                color: `${resType === "full" ? "black" : "white"}`,
+                fontSize: "1.25rem",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "white", color: "black" },
+              }}
+            >
+              Full Court $150/h
+            </Button>
+            <Button
+              onClick={() => {
+                setResType("half");
+                setStartTime(undefined);
+                setEndTime("");
+              }}
+              size="large"
+              sx={{
+                backgroundColor: `${resType === "half" ? "white" : "transparent"}`,
+                color: `${resType === "half" ? "black" : "white"}`,
+                fontSize: "1.25rem",
+                fontWeight: "bold",
+                "&:hover": { backgroundColor: "white", color: "black" },
+              }}
+            >
+              Half Court $75/h
+            </Button>
+          </Box>
           <ScheduleMeeting
             borderRadius={25}
             primaryColor="#E57E31"

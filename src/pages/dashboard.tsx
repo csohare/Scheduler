@@ -1,13 +1,37 @@
+/* TODO:
+ *    Fix Delete reservation functionality
+ *    Handle Modals for each case (set business hours given time range)
+ *      - Invalidate all current CheckoutSessions
+ *      - Create postgres function to check for reservations that are type business hour and remove those
+ *      - Check for overlapping with current reservations
+ *      - Add the new business hours
+ *    Creating a reservation manually
+ *      - Invalidate all checkout sessions
+ *      - Check if reservation overlaps with any others
+ *      - Return reservations that overlap if it does
+ *      - If no overlap just insert it into reservations
+ *   Handle errors from these operations with an alert at the top of the page
+ */
+
 import { Navigate } from "react-router-dom";
 import { supabase } from "../config/supabaseClient";
 import { AuthContextType, useAuth } from "../context/authProvider";
 import { useState, useEffect } from "react";
-import { Box, Button, Container } from "@mui/material";
-import { DataGrid, GridColDef } from "@mui/x-data-grid";
+import {
+  Backdrop,
+  Box,
+  Button,
+  Container,
+  Fade,
+  IconButton,
+  Modal,
+} from "@mui/material";
+import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Tables } from "../util/types/supabaseTypes";
 import { fetchReservations } from "../api/reservationQuery";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", sortable: false, flex: 3 },
@@ -18,6 +42,18 @@ const columns: GridColDef[] = [
   { field: "status", headerName: "Status", flex: 1 },
 ];
 
+const modalBoxStyle = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "#E57E31",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
 export default function Dashboard() {
   const { session } = useAuth() as AuthContextType;
   const [reservations, setReservations] = useState<
@@ -26,6 +62,8 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [resStart, setResStart] = useState<Dayjs | null>(null);
   const [resEnd, setResEnd] = useState<Dayjs | null>(null);
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+  const [resOpen, setResOpen] = useState(false);
 
   useEffect(() => {
     const today = new Date();
@@ -61,7 +99,7 @@ export default function Dashboard() {
       const res_end = resEnd.toDate().toLocaleString();
       console.log(res_start, res_end);
 
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("reservation")
         .insert([
           {
@@ -76,13 +114,24 @@ export default function Dashboard() {
       if (error) {
         setError(error.message);
       }
-      console.log(data);
       window.location.reload();
     }
   };
+  const handleRowSelection = (selectionModel: GridRowSelectionModel) => {
+    setSelectedRows(selectionModel);
+  };
+
+  const handleDeleteReservations = async () => {
+    const response = await supabase
+      .from("reservation")
+      .delete()
+      .in("id", selectedRows);
+    console.log(response);
+    window.location.reload();
+  };
+
   console.log(error);
 
-  //TODO: style reservation creation and add delete reservation functionality on the reservation data grid
   return (
     <Container>
       <Box
@@ -117,8 +166,15 @@ export default function Dashboard() {
           columns={columns}
           checkboxSelection
           autoHeight
+          rowSelectionModel={selectedRows}
+          onRowSelectionModelChange={handleRowSelection}
           sx={{
             color: "white",
+            "& .MuiSelect-icon": {
+              color: "white",
+            },
+            "& .MuiIconButton-root.Mui-disabled": { color: "black" },
+            "& .MuiIconButton-root": { color: "white" },
             "& .MuiTablePagination-root": { color: "white" },
             "& .MuiCheckbox-root": {
               color: "white",
@@ -148,7 +204,36 @@ export default function Dashboard() {
             },
           }}
         />
+        {selectedRows.length !== 0 && (
+          <IconButton onClick={handleDeleteReservations}>
+            <DeleteIcon sx={{ color: "white" }} />
+          </IconButton>
+        )}
       </Box>
+      <Box>
+        <Button
+          variant="contained"
+          color="warning"
+          onClick={() => setResOpen(true)}
+        >
+          Create Reservation
+        </Button>
+      </Box>
+      <Modal
+        open={resOpen}
+        onClose={() => setResOpen(false)}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 500,
+          },
+        }}
+      >
+        <Fade in={resOpen}>
+          <Box sx={modalBoxStyle}>THIS IS SOME STUFF IN THE MODAL</Box>
+        </Fade>
+      </Modal>
     </Container>
   );
 }
