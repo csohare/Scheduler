@@ -25,6 +25,7 @@ import {
   Fade,
   IconButton,
   Modal,
+  styled,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Tables } from "../util/types/supabaseTypes";
@@ -32,6 +33,25 @@ import { fetchReservations } from "../api/reservationQuery";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
+
+const StyledDateTimePicker = styled(DateTimePicker)({
+  "& .MuiOutlinedInput-root": {
+    color: "white",
+    "& fieldset": {
+      borderColor: "white", // Default border color
+    },
+    "&:hover fieldset": {
+      borderColor: "#E57E31", // Border color on hover
+      borderWidth: "2px",
+    },
+    "&.Mui-focused fieldset": {
+      borderColor: "#E57E31", // Border color when focused
+    },
+    "& .MuiSvgIcon-root": {
+      color: "white",
+    },
+  },
+});
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", sortable: false, flex: 3 },
@@ -47,11 +67,12 @@ const modalBoxStyle = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 400,
-  bgcolor: "#E57E31",
+  bgcolor: "#222222",
   border: "2px solid #000",
   boxShadow: 24,
   p: 4,
+  display: "flex",
+  flexDirection: "row",
 };
 
 export default function Dashboard() {
@@ -143,23 +164,7 @@ export default function Dashboard() {
         borderRadius="16px"
         width="100%"
         marginY="1rem"
-      >
-        <DateTimePicker
-          value={resStart}
-          onChange={(newStart) => setResStart(newStart)}
-        />
-        <DateTimePicker
-          value={resEnd}
-          onChange={(newEnd) => setResEnd(newEnd)}
-        />
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={handleReservationSubmit}
-        >
-          Create Reservation
-        </Button>
-      </Box>
+      ></Box>
       <Box sx={{}}>
         <DataGrid
           rows={reservations}
@@ -215,6 +220,7 @@ export default function Dashboard() {
           variant="contained"
           color="warning"
           onClick={() => setResOpen(true)}
+          sx={{ marginTop: 2 }}
         >
           Create Reservation
         </Button>
@@ -231,7 +237,31 @@ export default function Dashboard() {
         }}
       >
         <Fade in={resOpen}>
-          <Box sx={modalBoxStyle}>THIS IS SOME STUFF IN THE MODAL</Box>
+          <Box sx={modalBoxStyle}>
+            <StyledDateTimePicker
+              value={resStart}
+              onChange={(newStart) => setResStart(newStart)}
+              sx={{ width: "100%", margin: 1 }}
+            />
+            <StyledDateTimePicker
+              value={resEnd}
+              onChange={(newEnd) => setResEnd(newEnd)}
+              sx={{ width: "100%", margin: 1 }}
+            />
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={handleReservationSubmit}
+              sx={{
+                fontWeight: "bold",
+                fontSize: "1.1rem",
+                width: "100%",
+                margin: 1,
+              }}
+            >
+              Create Reservation
+            </Button>
+          </Box>
         </Fade>
       </Modal>
     </Container>
