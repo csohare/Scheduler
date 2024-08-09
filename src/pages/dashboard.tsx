@@ -1,4 +1,4 @@
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { supabase } from "../config/supabaseClient";
 import { AuthContextType, useAuth } from "../context/authProvider";
 import { useState, useEffect } from "react";
@@ -26,8 +26,6 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [resStart, setResStart] = useState<Dayjs | null>(null);
   const [resEnd, setResEnd] = useState<Dayjs | null>(null);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const today = new Date();
@@ -84,6 +82,7 @@ export default function Dashboard() {
   };
   console.log(error);
 
+  //TODO: style reservation creation and add delete reservation functionality on the reservation data grid
   return (
     <Container>
       <Box
