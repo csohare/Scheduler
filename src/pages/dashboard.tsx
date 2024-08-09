@@ -120,8 +120,11 @@ export default function Dashboard() {
           sx={{
             color: "white",
             "& .MuiTablePagination-root": { color: "white" },
-            "& .Mui-checked": {
-              color: "#E57E31",
+            "& .MuiCheckbox-root": {
+              color: "white",
+            },
+            "& .MuiCheckbox-root.Mui-checked": {
+              color: "white",
             },
             "& .MuiDataGrid-columnHeaders": {
               backgroundColor: "#E57E31",
