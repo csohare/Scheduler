@@ -155,17 +155,7 @@ export default function Dashboard() {
 
   return (
     <Container>
-      <Box
-        display="flex"
-        justifyContent="space-evenly"
-        alignItems="center"
-        border={1}
-        borderColor="#E57E31"
-        borderRadius="16px"
-        width="100%"
-        marginY="1rem"
-      ></Box>
-      <Box sx={{}}>
+      <Box sx={{ marginTop: 5 }}>
         <DataGrid
           rows={reservations}
           columns={columns}
@@ -241,12 +231,12 @@ export default function Dashboard() {
             <StyledDateTimePicker
               value={resStart}
               onChange={(newStart) => setResStart(newStart)}
-              sx={{ width: "100%", margin: 1 }}
+              sx={{ width: "auto", margin: 1 }}
             />
             <StyledDateTimePicker
               value={resEnd}
               onChange={(newEnd) => setResEnd(newEnd)}
-              sx={{ width: "100%", margin: 1 }}
+              sx={{ width: "auto", margin: 1 }}
             />
             <Button
               variant="contained"
@@ -255,7 +245,8 @@ export default function Dashboard() {
               sx={{
                 fontWeight: "bold",
                 fontSize: "1.1rem",
-                width: "100%",
+                width: "auto",
+                maxWidth: "100%",
                 margin: 1,
               }}
             >
