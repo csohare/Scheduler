@@ -10,12 +10,12 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", width: 200, sortable: false },
-  { field: "res_start", headerName: "Start Time", width: 200 },
-  { field: "res_end", headerName: "End Time", width: 200 },
-  { field: "name", headerName: "Name", width: 150 },
-  { field: "type", headerName: "Type", width: 70 },
-  { field: "status", headerName: "Status", width: 130 },
+  { field: "id", headerName: "ID", sortable: false, flex: 2 },
+  { field: "res_start", headerName: "Start Time", flex: 1 },
+  { field: "res_end", headerName: "End Time", flex: 1 },
+  { field: "name", headerName: "Name", flex: 1 },
+  { field: "type", headerName: "Type", flex: 1 },
+  { field: "status", headerName: "Status", flex: 1 },
 ];
 
 export default function Dashboard() {
@@ -79,7 +79,7 @@ export default function Dashboard() {
         setError(error.message);
       }
       console.log(data);
-      navigate("/dashboard");
+      window.location.reload();
     }
   };
   console.log(error);
@@ -93,6 +93,7 @@ export default function Dashboard() {
         border={1}
         borderColor="#E57E31"
         borderRadius="16px"
+        width="100%"
         marginY="1rem"
       >
         <DateTimePicker
@@ -116,7 +117,34 @@ export default function Dashboard() {
           rows={reservations}
           columns={columns}
           checkboxSelection
-          sx={{ backgroundColor: "#E57E31" }}
+          autoHeight
+          sx={{
+            color: "white",
+            "& .MuiTablePagination-root": { color: "white" },
+            "& .Mui-checked": {
+              color: "#E57E31",
+            },
+            "& .MuiDataGrid-columnHeaders": {
+              backgroundColor: "#E57E31",
+              color: "black",
+            },
+            "& .MuiDataGrid-columnHeader": {
+              backgroundColor: "#E57E31",
+              color: "black",
+            },
+            "& .MuiDataGrid-row.Mui-selected": {
+              ":hover": {
+                backgroundColor: "rgba(229, 126, 49, 0.4)",
+              },
+              backgroundColor: "rgba(229, 126, 49, 0.4)",
+            },
+            "& .MuiDataGrid-row:hover": {
+              backgroundColor: "rgba(229, 126, 49, 0.2)",
+            },
+            "& .MuiDataGrid-cell:focus": {
+              outline: "none",
+            },
+          }}
         />
       </Box>
     </Container>
