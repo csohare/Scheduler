@@ -10,9 +10,9 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 
 const columns: GridColDef[] = [
-  { field: "id", headerName: "ID", sortable: false, flex: 2 },
-  { field: "res_start", headerName: "Start Time", flex: 1 },
-  { field: "res_end", headerName: "End Time", flex: 1 },
+  { field: "id", headerName: "ID", sortable: false, flex: 3 },
+  { field: "res_start", headerName: "Start Time", flex: 2 },
+  { field: "res_end", headerName: "End Time", flex: 2 },
   { field: "name", headerName: "Name", flex: 1 },
   { field: "type", headerName: "Type", flex: 1 },
   { field: "status", headerName: "Status", flex: 1 },
