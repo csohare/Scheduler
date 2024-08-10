@@ -26,13 +26,17 @@ import {
   IconButton,
   Modal,
   styled,
+  Typography,
 } from "@mui/material";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Tables } from "../util/types/supabaseTypes";
 import { fetchReservations } from "../api/reservationQuery";
+import findOverlappingReservations from "../api/reservationOverlapQuery";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import { Dayjs } from "dayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
+import validateReservation from "../util/validateReservation";
+import insertReservation from "../api/insertReservation";
 
 const StyledDateTimePicker = styled(DateTimePicker)({
   "& .MuiOutlinedInput-root": {
@@ -72,7 +76,7 @@ const modalBoxStyle = {
   boxShadow: 24,
   p: 4,
   display: "flex",
-  flexDirection: "row",
+  flexDirection: "column",
 };
 
 export default function Dashboard() {
@@ -118,24 +122,18 @@ export default function Dashboard() {
     } else {
       const res_start = resStart.toDate().toLocaleString();
       const res_end = resEnd.toDate().toLocaleString();
-      console.log(res_start, res_end);
 
-      const { error } = await supabase
-        .from("reservation")
-        .insert([
-          {
-            res_start,
-            res_end,
-            type: "full",
-            status: "COMPLETE",
-            name: "ADMIN",
-          },
-        ])
-        .select();
-      if (error) {
-        setError(error.message);
+      try {
+        const data = await findOverlappingReservations(res_start, res_end);
+        if (validateReservation(data, "full")) {
+          await insertReservation(res_start, res_end, "full", "ADMIN");
+          window.location.reload();
+        } else {
+          console.log("OVERLAPPING RESERVATION");
+        }
+      } catch (e) {
+        console.log(e);
       }
-      window.location.reload();
     }
   };
   const handleRowSelection = (selectionModel: GridRowSelectionModel) => {
@@ -164,6 +162,10 @@ export default function Dashboard() {
           rowSelectionModel={selectedRows}
           onRowSelectionModelChange={handleRowSelection}
           sx={{
+            "& .MuiDataGrid-overlay": {
+              backgroundColor: "transparent",
+              fontSize: "1rem",
+            },
             color: "white",
             "& .MuiSelect-icon": {
               color: "white",
@@ -228,30 +230,45 @@ export default function Dashboard() {
       >
         <Fade in={resOpen}>
           <Box sx={modalBoxStyle}>
-            <StyledDateTimePicker
-              value={resStart}
-              onChange={(newStart) => setResStart(newStart)}
-              sx={{ width: "auto", margin: 1 }}
-            />
-            <StyledDateTimePicker
-              value={resEnd}
-              onChange={(newEnd) => setResEnd(newEnd)}
-              sx={{ width: "auto", margin: 1 }}
-            />
-            <Button
-              variant="contained"
-              color="warning"
-              onClick={handleReservationSubmit}
-              sx={{
-                fontWeight: "bold",
-                fontSize: "1.1rem",
-                width: "auto",
-                maxWidth: "100%",
-                margin: 1,
-              }}
+            <Box
+              display="flex"
+              justifyContent="center"
+              color="white"
+              marginBottom={3}
             >
-              Create Reservation
-            </Button>
+              <Typography variant="h6">Create Single Reservation</Typography>
+            </Box>
+            <Box
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              alignContent="center"
+            >
+              <StyledDateTimePicker
+                value={resStart}
+                onChange={(newStart) => setResStart(newStart)}
+                sx={{ width: "auto", margin: 1 }}
+              />
+              <StyledDateTimePicker
+                value={resEnd}
+                onChange={(newEnd) => setResEnd(newEnd)}
+                sx={{ width: "auto", margin: 1 }}
+              />
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={handleReservationSubmit}
+                sx={{
+                  fontWeight: "bold",
+                  fontSize: "1.1rem",
+                  width: "auto",
+                  maxWidth: "100%",
+                  margin: 1,
+                }}
+              >
+                Create Reservation
+              </Button>
+            </Box>
           </Box>
         </Fade>
       </Modal>

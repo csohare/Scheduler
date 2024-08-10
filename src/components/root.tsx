@@ -13,14 +13,14 @@ export default function Root() {
   const navigate = useNavigate();
 
   return (
-    <div>
+    <Box width="100%" maxWidth="100%">
       <Box>
         <AppBar color="warning" position="static">
           <Toolbar>
             <IconButton
               size="large"
               edge="start"
-              sx={{ mr: 2 }}
+              sx={{ mr: 1 }}
               onClick={() => {
                 navigate("/");
               }}
@@ -48,8 +48,10 @@ export default function Root() {
           </Toolbar>
         </AppBar>
       </Box>
-      <Outlet />
-    </div>
+      <Box>
+        <Outlet />
+      </Box>
+    </Box>
     /*
     <div className="flex flex-col w-full">
       <div className="flex justify-center">
