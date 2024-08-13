@@ -1,13 +1,3 @@
-/* TODO:
- *    Handle Modals for each case (set business hours given time range)
- *      - Check for overlapping with current reservations
- *      - Create postgres function to check for reservations that are type business hour and remove those
- *      - Add the new business hours
- *    Creating a reservation manually
- *      - Just need to show overlapping reservations somewhere
- *   Handle errors from these operations with an alert at the top of the page
- */
-
 import { Navigate } from "react-router-dom";
 import { supabase } from "../config/supabaseClient";
 import { AuthContextType, useAuth } from "../context/authProvider";
@@ -18,6 +8,7 @@ import { Tables } from "../util/types/supabaseTypes";
 import { fetchReservations } from "../api/reservationQuery";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReservationModal from "../components/reservationModal";
+import BusinessHoursModal from "../components/businessHoursModal";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", sortable: false, flex: 3 },
@@ -36,6 +27,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
 
   const [resOpen, setResOpen] = useState(false);
+  const [businessOpen, setBusinessOpen] = useState(false);
 
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
 
@@ -150,15 +142,25 @@ export default function Dashboard() {
             variant="contained"
             color="warning"
             onClick={() => setResOpen(true)}
-            sx={{ marginBottom: 1.5, padding: 1.5, fontWeight: "bold" }}
+            sx={{
+              marginBottom: 1.5,
+              padding: 2,
+              fontWeight: "bold",
+              fontSize: "medium",
+            }}
           >
             Create Reservation
           </Button>
           <Button
             variant="contained"
             color="warning"
-            onClick={() => setResOpen(true)}
-            sx={{ marginBottom: 1.5, padding: 1.5, fontWeight: "bold" }}
+            onClick={() => setBusinessOpen(true)}
+            sx={{
+              marginBottom: 1.5,
+              padding: 2,
+              fontWeight: "bold",
+              fontSize: "medium",
+            }}
           >
             Set Business Hours
           </Button>
@@ -170,6 +172,7 @@ export default function Dashboard() {
         </Box>
       </Box>
       <ReservationModal open={resOpen} setOpen={setResOpen} />
+      <BusinessHoursModal open={businessOpen} setOpen={setBusinessOpen} />
     </Container>
   );
 }
