@@ -1,15 +1,10 @@
 /* TODO:
- *    Fix Delete reservation functionality
  *    Handle Modals for each case (set business hours given time range)
- *      - Invalidate all current CheckoutSessions
- *      - Create postgres function to check for reservations that are type business hour and remove those
  *      - Check for overlapping with current reservations
+ *      - Create postgres function to check for reservations that are type business hour and remove those
  *      - Add the new business hours
  *    Creating a reservation manually
- *      - Invalidate all checkout sessions
- *      - Check if reservation overlaps with any others
- *      - Return reservations that overlap if it does
- *      - If no overlap just insert it into reservations
+ *      - Just need to show overlapping reservations somewhere
  *   Handle errors from these operations with an alert at the top of the page
  */
 
@@ -17,45 +12,12 @@ import { Navigate } from "react-router-dom";
 import { supabase } from "../config/supabaseClient";
 import { AuthContextType, useAuth } from "../context/authProvider";
 import { useState, useEffect } from "react";
-import {
-  Backdrop,
-  Box,
-  Button,
-  Container,
-  Fade,
-  IconButton,
-  Modal,
-  styled,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Container, IconButton } from "@mui/material";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Tables } from "../util/types/supabaseTypes";
 import { fetchReservations } from "../api/reservationQuery";
-import findOverlappingReservations from "../api/reservationOverlapQuery";
-import { DateTimePicker } from "@mui/x-date-pickers";
-import { Dayjs } from "dayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
-import validateReservation from "../util/validateReservation";
-import insertReservation from "../api/insertReservation";
-
-const StyledDateTimePicker = styled(DateTimePicker)({
-  "& .MuiOutlinedInput-root": {
-    color: "white",
-    "& fieldset": {
-      borderColor: "white", // Default border color
-    },
-    "&:hover fieldset": {
-      borderColor: "#E57E31", // Border color on hover
-      borderWidth: "2px",
-    },
-    "&.Mui-focused fieldset": {
-      borderColor: "#E57E31", // Border color when focused
-    },
-    "& .MuiSvgIcon-root": {
-      color: "white",
-    },
-  },
-});
+import ReservationModal from "../components/reservationModal";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", sortable: false, flex: 3 },
@@ -66,29 +28,16 @@ const columns: GridColDef[] = [
   { field: "status", headerName: "Status", flex: 1 },
 ];
 
-const modalBoxStyle = {
-  position: "absolute",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  bgcolor: "#222222",
-  border: "2px solid #000",
-  boxShadow: 24,
-  p: 4,
-  display: "flex",
-  flexDirection: "column",
-};
-
 export default function Dashboard() {
   const { session } = useAuth() as AuthContextType;
   const [reservations, setReservations] = useState<
     Tables<"reservation">[] | undefined
   >([]);
   const [error, setError] = useState<string | null>(null);
-  const [resStart, setResStart] = useState<Dayjs | null>(null);
-  const [resEnd, setResEnd] = useState<Dayjs | null>(null);
-  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+
   const [resOpen, setResOpen] = useState(false);
+
+  const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
 
   useEffect(() => {
     const today = new Date();
@@ -116,26 +65,6 @@ export default function Dashboard() {
     return <Navigate to={"/"} replace />;
   }
 
-  const handleReservationSubmit = async () => {
-    if (!resStart || !resEnd) {
-      setError("Please set start and end time");
-    } else {
-      const res_start = resStart.toDate().toLocaleString();
-      const res_end = resEnd.toDate().toLocaleString();
-
-      try {
-        const data = await findOverlappingReservations(res_start, res_end);
-        if (validateReservation(data, "full")) {
-          await insertReservation(res_start, res_end, "full", "ADMIN");
-          window.location.reload();
-        } else {
-          console.log("OVERLAPPING RESERVATION");
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  };
   const handleRowSelection = (selectionModel: GridRowSelectionModel) => {
     setSelectedRows(selectionModel);
   };
@@ -152,126 +81,95 @@ export default function Dashboard() {
   console.log(error);
 
   return (
-    <Container>
-      <Box sx={{ marginTop: 5 }}>
-        <DataGrid
-          rows={reservations}
-          columns={columns}
-          checkboxSelection
-          autoHeight
-          rowSelectionModel={selectedRows}
-          onRowSelectionModelChange={handleRowSelection}
-          sx={{
-            "& .MuiDataGrid-overlay": {
-              backgroundColor: "transparent",
-              fontSize: "1rem",
-            },
-            color: "white",
-            "& .MuiSelect-icon": {
+    <Container maxWidth="xl">
+      <Box
+        sx={{ marginTop: 5 }}
+        display="flex"
+        flexDirection="row"
+        alignContent="start"
+        justifyContent="start"
+      >
+        <Box display="flex" flexGrow={1}>
+          <DataGrid
+            rows={reservations}
+            columns={columns}
+            checkboxSelection
+            autoHeight
+            rowSelectionModel={selectedRows}
+            onRowSelectionModelChange={handleRowSelection}
+            initialState={{
+              columns: {
+                columnVisibilityModel: {
+                  id: false,
+                },
+              },
+            }}
+            sx={{
+              "& .MuiDataGrid-overlay": {
+                backgroundColor: "transparent",
+                fontSize: "1rem",
+              },
               color: "white",
-            },
-            "& .MuiIconButton-root.Mui-disabled": { color: "black" },
-            "& .MuiIconButton-root": { color: "white" },
-            "& .MuiTablePagination-root": { color: "white" },
-            "& .MuiCheckbox-root": {
-              color: "white",
-            },
-            "& .MuiCheckbox-root.Mui-checked": {
-              color: "white",
-            },
-            "& .MuiDataGrid-columnHeaders": {
-              backgroundColor: "#E57E31",
-              color: "black",
-            },
-            "& .MuiDataGrid-columnHeader": {
-              backgroundColor: "#E57E31",
-              color: "black",
-            },
-            "& .MuiDataGrid-row.Mui-selected": {
-              ":hover": {
+              "& .MuiSelect-icon": {
+                color: "white",
+              },
+              "& .MuiIconButton-root.Mui-disabled": { color: "black" },
+              "& .MuiIconButton-root": { color: "white" },
+              "& .MuiTablePagination-root": { color: "white" },
+              "& .MuiCheckbox-root": {
+                color: "white",
+              },
+              "& .MuiCheckbox-root.Mui-checked": {
+                color: "white",
+              },
+              "& .MuiDataGrid-columnHeaders": {
+                backgroundColor: "#E57E31",
+                color: "black",
+              },
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: "#E57E31",
+                color: "black",
+              },
+              "& .MuiDataGrid-row.Mui-selected": {
+                ":hover": {
+                  backgroundColor: "rgba(229, 126, 49, 0.4)",
+                },
                 backgroundColor: "rgba(229, 126, 49, 0.4)",
               },
-              backgroundColor: "rgba(229, 126, 49, 0.4)",
-            },
-            "& .MuiDataGrid-row:hover": {
-              backgroundColor: "rgba(229, 126, 49, 0.2)",
-            },
-            "& .MuiDataGrid-cell:focus": {
-              outline: "none",
-            },
-          }}
-        />
-        {selectedRows.length !== 0 && (
-          <IconButton onClick={handleDeleteReservations}>
-            <DeleteIcon sx={{ color: "white" }} />
-          </IconButton>
-        )}
+              "& .MuiDataGrid-row:hover": {
+                backgroundColor: "rgba(229, 126, 49, 0.2)",
+              },
+              "& .MuiDataGrid-cell:focus": {
+                outline: "none",
+              },
+            }}
+          />
+        </Box>
+        <Box display="flex" flexDirection="column" marginLeft={1.5}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setResOpen(true)}
+            sx={{ marginBottom: 1.5, padding: 1.5, fontWeight: "bold" }}
+          >
+            Create Reservation
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setResOpen(true)}
+            sx={{ marginBottom: 1.5, padding: 1.5, fontWeight: "bold" }}
+          >
+            Set Business Hours
+          </Button>
+          {selectedRows.length !== 0 && (
+            <IconButton onClick={handleDeleteReservations}>
+              <DeleteIcon sx={{ color: "white" }} />
+            </IconButton>
+          )}
+        </Box>
       </Box>
-      <Box>
-        <Button
-          variant="contained"
-          color="warning"
-          onClick={() => setResOpen(true)}
-          sx={{ marginTop: 2 }}
-        >
-          Create Reservation
-        </Button>
-      </Box>
-      <Modal
-        open={resOpen}
-        onClose={() => setResOpen(false)}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 500,
-          },
-        }}
-      >
-        <Fade in={resOpen}>
-          <Box sx={modalBoxStyle}>
-            <Box
-              display="flex"
-              justifyContent="center"
-              color="white"
-              marginBottom={3}
-            >
-              <Typography variant="h6">Create Single Reservation</Typography>
-            </Box>
-            <Box
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              alignContent="center"
-            >
-              <StyledDateTimePicker
-                value={resStart}
-                onChange={(newStart) => setResStart(newStart)}
-                sx={{ width: "auto", margin: 1 }}
-              />
-              <StyledDateTimePicker
-                value={resEnd}
-                onChange={(newEnd) => setResEnd(newEnd)}
-                sx={{ width: "auto", margin: 1 }}
-              />
-              <Button
-                variant="contained"
-                color="warning"
-                onClick={handleReservationSubmit}
-                sx={{
-                  fontWeight: "bold",
-                  fontSize: "1.1rem",
-                  width: "auto",
-                  maxWidth: "100%",
-                  margin: 1,
-                }}
-              >
-                Create Reservation
-              </Button>
-            </Box>
-          </Box>
-        </Fade>
-      </Modal>
+      <ReservationModal open={resOpen} setOpen={setResOpen} />
     </Container>
   );
 }
