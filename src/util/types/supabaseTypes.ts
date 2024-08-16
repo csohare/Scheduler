@@ -27,26 +27,29 @@ export type Database = {
       reservation: {
         Row: {
           created_at: string
-          id: number
-          name: string
+          id: string
+          name: string | null
           res_end: string
           res_start: string
+          status: string
           type: string
         }
         Insert: {
           created_at?: string
-          id?: number
-          name: string
+          id?: string
+          name?: string | null
           res_end: string
           res_start: string
+          status?: string
           type: string
         }
         Update: {
           created_at?: string
-          id?: number
-          name?: string
+          id?: string
+          name?: string | null
           res_end?: string
           res_start?: string
+          status?: string
           type?: string
         }
         Relationships: []
@@ -56,7 +59,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      insert_business_hours:
+        | {
+            Args: {
+              reservation_array: Database["public"]["Tables"]["reservation"]["Row"][]
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              reservation_array: Json
+              start_date: string
+              end_date: string
+            }
+            Returns: undefined
+          }
     }
     Enums: {
       [_ in never]: never

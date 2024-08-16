@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import { StyledDatePicker } from "./styledDatePicker";
 import { StyledTimePicker } from "./styledTimePicker";
+import insertBusinessHours from "../util/insertBusinessHours";
 
 const modalBoxStyle = {
   position: "absolute",
@@ -34,15 +35,33 @@ export default function BusinessHoursModal({
   open,
   setOpen,
 }: BusinessHoursModalProps) {
-  const [startDate, setStartDate] = useState<Dayjs | null>();
-  const [endDate, setEndDate] = useState<Dayjs | null>();
-  const [openTime, setOpenTime] = useState<Dayjs | null>();
-  const [closeTime, setCloseTime] = useState<Dayjs | null>();
+  const [startDate, setStartDate] = useState<Dayjs | null>(null);
+  const [endDate, setEndDate] = useState<Dayjs | null>(null);
+  const [openTime, setOpenTime] = useState<Dayjs | null>(null);
+  const [closeTime, setCloseTime] = useState<Dayjs | null>(null);
   const [error, setError] = useState("");
 
-  const handleBusinessHoursSubmit = () => {
+  const handleBusinessHoursSubmit = async () => {
     if (!startDate || !endDate || !openTime || !closeTime) {
       setError("Fill Out all Form Fields");
+    } else {
+      if (endDate.toDate() < startDate.toDate()) {
+        setError("Start Date Cannot Be After End Date");
+      }
+      if (closeTime <= openTime) {
+        setError("Open Time Cannot Be the Same or After Closing Time");
+      }
+      try {
+        await insertBusinessHours(
+          startDate.toDate(),
+          endDate.toDate(),
+          openTime.toDate(),
+          closeTime.toDate(),
+        );
+        window.location.reload();
+      } catch (e) {
+        if (e instanceof Error) setError(e.message);
+      }
     }
   };
 
@@ -81,8 +100,13 @@ export default function BusinessHoursModal({
               {error}
             </Alert>
           )}
-          <Box display="flex" flexDirection="column" alignContent="center">
-            <Box marginY={1}>
+          <Box
+            display="flex"
+            flexDirection="column"
+            alignContent="center"
+            justifyContent="center"
+          >
+            <Box marginY={1} display="flex" justifyContent="center">
               <StyledDatePicker
                 label="Start Date"
                 sx={{ margin: 1 }}
@@ -96,7 +120,7 @@ export default function BusinessHoursModal({
                 onChange={(newEndDate) => setEndDate(newEndDate)}
               />
             </Box>
-            <Box>
+            <Box display="flex" justifyContent="center">
               <StyledTimePicker
                 label="Open Time"
                 sx={{ margin: 1 }}
@@ -123,7 +147,7 @@ export default function BusinessHoursModal({
                 marginTop: 2,
               }}
             >
-              Create Reservation
+              Set Business Hours
             </Button>
           </Box>
         </Box>

@@ -15,8 +15,6 @@ import {
   Alert,
 } from "@mui/material";
 import { StyledDateTimePicker } from "./styledDateTimePicker";
-import findOverlappingReservations from "../api/reservationOverlapQuery";
-import validateReservation from "../util/validateReservation";
 import insertReservation from "../api/insertReservation";
 
 const modalBoxStyle = {
@@ -54,21 +52,18 @@ export default function ReservationModal({
       const res_start = resStart.toDate().toLocaleString();
       const res_end = resEnd.toDate().toLocaleString();
 
+      if (resEnd.toDate() <= resStart.toDate()) {
+        setError("Reservation Start Time Cannot Be After End Time");
+        return;
+      }
       try {
-        const data = await findOverlappingReservations(res_start, res_end);
-        if (validateReservation(data, "full")) {
-          await insertReservation(res_start, res_end, resType, resName!);
-          window.location.reload();
-        } else {
-          setError("Reservation overlaps with another");
-        }
+        await insertReservation(res_start, res_end, resType, resName!);
+        window.location.reload();
       } catch (e) {
         if (e instanceof Error) setError(e.message);
       }
     }
   };
-
-  console.log(error);
 
   return (
     <Modal
@@ -112,7 +107,7 @@ export default function ReservationModal({
             <Box
               display="flex"
               flexDirection="row"
-              justifyContent="space-evenly"
+              justifyContent="start"
               alignContent="center"
             >
               <StyledDateTimePicker

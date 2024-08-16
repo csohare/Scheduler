@@ -86,10 +86,14 @@ export default function Dashboard() {
             rows={reservations}
             columns={columns}
             checkboxSelection
-            autoHeight
             rowSelectionModel={selectedRows}
             onRowSelectionModelChange={handleRowSelection}
+            autoHeight
+            pageSizeOptions={[5, 10, 25]}
             initialState={{
+              pagination: {
+                paginationModel: { pageSize: 10 },
+              },
               columns: {
                 columnVisibilityModel: {
                   id: false,
@@ -122,6 +126,9 @@ export default function Dashboard() {
                 backgroundColor: "#E57E31",
                 color: "black",
               },
+              "& .MuiDataGrid-columnHeader:focus": {
+                outline: "none",
+              },
               "& .MuiDataGrid-row.Mui-selected": {
                 ":hover": {
                   backgroundColor: "rgba(229, 126, 49, 0.4)",
@@ -146,7 +153,7 @@ export default function Dashboard() {
               marginBottom: 1.5,
               padding: 2,
               fontWeight: "bold",
-              fontSize: "medium",
+              fontSize: "1rem",
             }}
           >
             Create Reservation
@@ -159,7 +166,7 @@ export default function Dashboard() {
               marginBottom: 1.5,
               padding: 2,
               fontWeight: "bold",
-              fontSize: "medium",
+              fontSize: "1rem",
             }}
           >
             Set Business Hours
