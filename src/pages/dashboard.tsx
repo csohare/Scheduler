@@ -149,8 +149,10 @@ export default function Dashboard() {
         <Box
           display="flex"
           flexDirection="column"
-          marginLeft={1.5}
-          sx={{ marginTop: { xs: 2, sm: 2, md: 0, lg: 0 } }}
+          sx={{
+            marginLeft: { md: 1.5, lg: 1.5 },
+            marginTop: { xs: 2, sm: 2, md: 0, lg: 0 },
+          }}
         >
           <Button
             variant="contained"
