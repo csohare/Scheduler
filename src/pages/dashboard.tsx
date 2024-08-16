@@ -75,9 +75,11 @@ export default function Dashboard() {
   return (
     <Container maxWidth="xl">
       <Box
-        sx={{ marginTop: 5 }}
+        sx={{
+          marginTop: 5,
+          flexDirection: { xs: "column", sm: "column", md: "row", lg: "row" },
+        }}
         display="flex"
-        flexDirection="row"
         alignContent="start"
         justifyContent="start"
       >
@@ -144,7 +146,12 @@ export default function Dashboard() {
             }}
           />
         </Box>
-        <Box display="flex" flexDirection="column" marginLeft={1.5}>
+        <Box
+          display="flex"
+          flexDirection="column"
+          marginLeft={1.5}
+          sx={{ marginTop: { xs: 2, sm: 2, md: 0, lg: 0 } }}
+        >
           <Button
             variant="contained"
             color="warning"

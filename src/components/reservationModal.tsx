@@ -86,6 +86,7 @@ export default function ReservationModal({
         <Box sx={modalBoxStyle}>
           <Box
             display="flex"
+            alignContent="center"
             justifyContent="center"
             color="white"
             marginBottom={2}
