@@ -6,10 +6,19 @@ import { Box, Button, Container, IconButton } from "@mui/material";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Tables } from "../util/types/supabaseTypes";
 import { fetchReservations } from "../api/reservationQuery";
+import {
+  DayPilot,
+  DayPilotCalendar,
+  DayPilotNavigator,
+} from "@daypilot/daypilot-lite-react";
+import dayjs from "dayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReservationModal from "../components/reservationModal";
 import BusinessHoursModal from "../components/businessHoursModal";
 
+const CLOSED = "#949494";
+const FULL = "#90ee90";
+const PENDING = "#ffa500";
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", sortable: false, flex: 3 },
   { field: "res_start", headerName: "Start Time", flex: 2 },
@@ -24,12 +33,16 @@ export default function Dashboard() {
   const [reservations, setReservations] = useState<
     Tables<"reservation">[] | undefined
   >([]);
+  const [events, setEvents] = useState<DayPilot.EventData[] | undefined>();
   const [error, setError] = useState<string | null>(null);
-
   const [resOpen, setResOpen] = useState(false);
   const [businessOpen, setBusinessOpen] = useState(false);
 
   const [selectedRows, setSelectedRows] = useState<GridRowSelectionModel>([]);
+
+  const [startDate, setStartDate] = useState<DayPilot.Date | undefined>(
+    DayPilot.Date.now(),
+  );
 
   useEffect(() => {
     const today = new Date();
@@ -39,13 +52,42 @@ export default function Dashboard() {
 
     fetchReservations(today, week)
       .then((data) => {
-        const formattedData = data?.map((res) => {
+        const formattedData = data
+          ?.map((res) => {
+            if (res.status === "HOURS") {
+              return null;
+            }
+            return {
+              ...res,
+              res_start: new Date(res.res_start).toLocaleString(),
+              res_end: new Date(res.res_end).toLocaleString(),
+            };
+          })
+          .filter((item) => item !== null);
+        const formattedEvents = data?.map((res) => {
+          let text = `Type: ${res.type} court \nName: ${res.name}\nStatus: ${res.status}`;
+          let background = FULL;
+
+          if (res.status === "HOURS") {
+            text = `Closed`;
+            background = CLOSED;
+          } else if (res.status === "PENDING") {
+            background = PENDING;
+          }
           return {
-            ...res,
-            res_start: new Date(res.res_start).toLocaleString(),
-            res_end: new Date(res.res_end).toLocaleString(),
+            id: res.id,
+            text,
+            start: dayjs(res.res_start).format("YYYY-MM-DDTHH:mm:ss"),
+            end: dayjs(res.res_end).format("YYYY-MM-DDTHH:mm:ss"),
+            backColor: background,
+            resizeDisabled: true,
+            moveDisabled: true,
+            clickDisabled: true,
+            deleteDisabled: true,
+            rightClickDisabled: true,
           };
         });
+        setEvents(formattedEvents);
         setReservations(formattedData);
       })
       .catch((error) => {
@@ -186,6 +228,24 @@ export default function Dashboard() {
             </IconButton>
           )}
         </Box>
+      </Box>
+      <Box display="flex" flexDirection="row" marginY={3}>
+        <DayPilotNavigator
+          selectMode="Week"
+          showMonths={3}
+          skipMonths={3}
+          selectionDay={startDate}
+          onTimeRangeSelected={(args) => {
+            setStartDate(args.day);
+          }}
+        />
+        <DayPilotCalendar
+          viewType="Week"
+          startDate={startDate}
+          events={events}
+          heightSpec="Full"
+          durationBarVisible={false}
+        />
       </Box>
       <ReservationModal open={resOpen} setOpen={setResOpen} />
       <BusinessHoursModal open={businessOpen} setOpen={setBusinessOpen} />
