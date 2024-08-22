@@ -1,4 +1,4 @@
-import { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useState } from "react";
 import {
   Alert,
@@ -52,11 +52,20 @@ export default function BusinessHoursModal({
         setError("Open Time Cannot Be the Same or After Closing Time");
       }
       try {
+        const formattedOpenTime = dayjs(openTime)
+          .set("year", startDate.year())
+          .set("month", startDate.month())
+          .set("date", startDate.date());
+        const formattedCloseTime = dayjs(closeTime)
+          .set("year", endDate.year())
+          .set("month", endDate.month())
+          .set("date", endDate.date());
+
         await insertBusinessHours(
           startDate.toDate(),
           endDate.toDate(),
-          openTime.toDate(),
-          closeTime.toDate(),
+          formattedOpenTime.toDate(),
+          formattedCloseTime.toDate(),
         );
         window.location.reload();
       } catch (e) {
