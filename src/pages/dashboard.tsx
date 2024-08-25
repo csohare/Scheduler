@@ -21,11 +21,12 @@ import dayjs from "dayjs";
 import DeleteIcon from "@mui/icons-material/Delete";
 import ReservationModal from "../components/reservationModal";
 import BusinessHoursModal from "../components/businessHoursModal";
-import "../boombasetheme.css";
+import "../boombase_test_theme.css";
+import "../navigatortheme.css";
 
-const CLOSED = "#949494";
-const FULL = "#90ee90";
-const PENDING = "#ffa500";
+const CLOSED = "#404040";
+const FULL = "#008000";
+const PENDING = "#E57E31";
 const columns: GridColDef[] = [
   { field: "id", headerName: "ID", sortable: false, flex: 3 },
   { field: "res_start", headerName: "Start Time", flex: 2 },
@@ -36,7 +37,7 @@ const columns: GridColDef[] = [
 ];
 
 export default function Dashboard() {
-  const { session, signIn, signOut } = useAuth() as AuthContextType;
+  const { session, signIn } = useAuth() as AuthContextType;
   const [reservations, setReservations] = useState<
     Tables<"reservation">[] | undefined
   >([]);
@@ -164,7 +165,6 @@ export default function Dashboard() {
             alignContent="start"
             justifyContent="start"
           >
-            {session && <Button onClick={signOut}>Log Out</Button>}
             <Box display="flex" flexGrow={1}>
               <DataGrid
                 rows={reservations}
@@ -278,6 +278,7 @@ export default function Dashboard() {
               onTimeRangeSelected={(args) => {
                 setStartDate(args.day);
               }}
+              theme="navigatortheme"
             />
             <DayPilotCalendar
               viewType="Week"
@@ -285,6 +286,7 @@ export default function Dashboard() {
               events={events}
               heightSpec="Full"
               durationBarVisible={false}
+              theme="boombase_test_theme"
             />
           </Box>
         </Box>
