@@ -57,9 +57,9 @@ export default function BusinessHoursModal({
           .set("month", startDate.month())
           .set("date", startDate.date());
         const formattedCloseTime = dayjs(closeTime)
-          .set("year", endDate.year())
-          .set("month", endDate.month())
-          .set("date", endDate.date());
+          .set("year", startDate.year())
+          .set("month", startDate.month())
+          .set("date", startDate.date());
 
         await insertBusinessHours(
           startDate.toDate(),

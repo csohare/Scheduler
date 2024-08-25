@@ -14,6 +14,6 @@ export const fetchReservations = async (startTime: Date, endTime: Date) => {
   if (data) {
     return data;
   } else if (error) {
-    throw new Error("Fetch Error");
+    throw new Error("Error fetching reservation data, please try again");
   }
 };

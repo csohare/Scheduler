@@ -165,6 +165,15 @@ export default function HomePage() {
       ) : (
         <div>
           {message && alertMessage}
+          <Box display="flex" justifyContent="center" alignContent="center">
+            <img
+              className="transition ease-in-out scale-125 select-none hover:cursor-pointer hover:scale-150 duration-300"
+              src="/logo.png"
+              onClick={() => {
+                navigate("/");
+              }}
+            />
+          </Box>
           <Box
             display="flex"
             alignItems="flex-end"
@@ -259,7 +268,7 @@ export default function HomePage() {
                 focused
                 sx={{
                   "& .MuiSelect-icon.Mui-disabled": {
-                    color: "white",
+                    color: "black",
                   },
                   "& .MuiSelect-icon": {
                     color: `${startTime && !endTime ? "white" : "#E57E31"}`,

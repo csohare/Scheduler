@@ -32,7 +32,6 @@ export default async function insertBusinessHours(
     openTime.setDate(currentDate.getDate());
     closeTime.setDate(currentDate.getDate());
   }
-  console.log(businessHoursIntervals);
 
   endDate.setHours(24, 0, 0, 0);
   const { error } = await supabase.rpc("insert_business_hours", {

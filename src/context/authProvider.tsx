@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       provider: "google",
       options: {
         //redirectTo: "https://scheduler-delta.vercel.app",
-        redirectTo: window.location.origin,
+        redirectTo: window.location.origin + window.location.pathname,
       },
     });
     console.log(data, error);
