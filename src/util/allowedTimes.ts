@@ -10,7 +10,7 @@ export default function allowedTimes(
 ): availableEnd[] {
   const ret: availableEnd[] = [];
 
-  for (let i = 1; i <= duration && i <= 6; i++) {
+  for (let i = 1; i <= duration; i++) {
     const endDate = new Date(startTime.getTime() + i * 60 * 60 * 1000);
     ret.push({
       endTime: endDate,

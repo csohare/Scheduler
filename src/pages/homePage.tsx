@@ -111,7 +111,6 @@ export default function HomePage() {
     setCsLoading(true);
     fetchCheckoutSession(startTime!, endTime, resType)
       .then((data) => {
-        console.log(data);
         window.location.href = data.url;
       })
       .catch((error) => {
@@ -147,8 +146,6 @@ export default function HomePage() {
       {message}
     </Alert>
   );
-
-  console.log(fullRes);
 
   return (
     <div className="container flex flex-col mx-auto mt-1 h-screen justify-start align-middle">
@@ -219,12 +216,12 @@ export default function HomePage() {
             </Button>
           </Box>
           <ScheduleMeeting
-            borderRadius={25}
+            borderRadius={15}
             primaryColor="#E57E31"
             backgroundColor="#333333"
-            eventDurationInMinutes={60}
+            eventDurationInMinutes={30}
             availableTimeslots={resType === "full" ? fullRes : halfRes}
-            startTimeListStyle="scroll-list"
+            //startTimeListStyle="scroll-list"
             onStartTimeSelect={handleOnStartTimeSelect}
             selectedStartTime={startTime}
             skipConfirmCheck={true}

@@ -29,10 +29,17 @@ export default async function insertBusinessHours(
     });
 
     currentDate.setDate(currentDate.getDate() + 1);
-    openTime.setDate(currentDate.getDate());
-    closeTime.setDate(currentDate.getDate());
+    openTime.setFullYear(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+    );
+    closeTime.setFullYear(
+      currentDate.getFullYear(),
+      currentDate.getMonth(),
+      currentDate.getDate(),
+    );
   }
-
   endDate.setHours(24, 0, 0, 0);
   const { error } = await supabase.rpc("insert_business_hours", {
     reservation_array: businessHoursIntervals,

@@ -8,7 +8,7 @@ export default function findFullIntervals(
 ): AvailableTimeslot[] {
   const ret: AvailableTimeslot[] = [];
 
-  const filteredIntervals: timeInterval[] = intervals.reduce(
+  const filteredIntervals: timeInterval[]= intervals.reduce(
     (acc: timeInterval[], item) => {
       if (item.type === "full") {
         acc.push({

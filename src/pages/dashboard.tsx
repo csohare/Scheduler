@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { DataGrid, GridColDef, GridRowSelectionModel } from "@mui/x-data-grid";
 import { Tables } from "../util/types/supabaseTypes";
-import { fetchReservations } from "../api/reservationQuery";
+import { fetchDashboardReservations } from "../api/dashboardReservationQuery";
 import {
   DayPilot,
   DayPilotCalendar,
@@ -54,10 +54,8 @@ export default function Dashboard() {
   useEffect(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const week = new Date(today);
-    week.setDate(today.getDate() + 11);
     const timeoutId = setTimeout(() => {
-      fetchReservations(today, week)
+      fetchDashboardReservations(today)
         .then((data) => {
           const formattedData = data
             ?.map((res) => {
@@ -102,7 +100,7 @@ export default function Dashboard() {
           setError(error.message);
           setLoading(false);
         });
-    }, 750);
+    }, 50);
     return () => {
       clearTimeout(timeoutId);
     };
