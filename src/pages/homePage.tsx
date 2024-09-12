@@ -3,7 +3,6 @@ import findFullIntervals from "../util/fullCourtIntervals";
 import findHalfIntervals from "../util/halfCourtIntervals";
 import allowedTimes from "../util/allowedTimes";
 import { fetchReservations } from "../api/reservationQuery";
-import { fetchCheckoutSession } from "../api/checkoutSessionQuery";
 import { availableEnd } from "../util/allowedTimes";
 import { ScheduleMeeting } from "react-schedule-meeting";
 import { AvailableTimeslot, StartTimeEvent } from "react-schedule-meeting";
@@ -20,6 +19,7 @@ import {
   Box,
   Alert,
 } from "@mui/material";
+import ReservationConfirmationModal from "../components/reservationConfirmationModal";
 
 export default function HomePage() {
   const [fullRes, setFullRes] = useState<AvailableTimeslot[]>([]);
@@ -29,9 +29,10 @@ export default function HomePage() {
   const [endTimes, setEndTimes] = useState<availableEnd[]>([]);
   const [resType, setResType] = useState("full");
   const [loading, setLoading] = useState(true);
-  const [csLoading, setCsLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState("");
+
+  const [open, setOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -106,6 +107,7 @@ export default function HomePage() {
     setEndTime(event.target.value);
   };
 
+  /*
   const handleFormSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setCsLoading(true);
@@ -123,6 +125,7 @@ export default function HomePage() {
         //navigate("/error", { state: { error } });
       });
   };
+  */
 
   const renderedEndTimes = endTimes.map((endTime) => {
     return (
@@ -227,7 +230,12 @@ export default function HomePage() {
             skipConfirmCheck={true}
           />
           <div className="mx-5">
-            <form onSubmit={handleFormSubmit}>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setOpen(true);
+              }}
+            >
               <TextField
                 className=""
                 value={
@@ -329,26 +337,21 @@ export default function HomePage() {
                   },
                 }}
               >
-                <Button
-                  variant="contained"
-                  type="submit"
-                  size="large"
-                  disabled={endTime && !csLoading ? false : true}
-                >
+                <Button variant="contained" type="submit" size="large">
                   Create Reservation
-                  {csLoading && (
-                    <CircularProgress
-                      className="ml-3"
-                      size={20}
-                      thickness={4}
-                    />
-                  )}
                 </Button>
               </Box>
             </form>
           </div>
         </div>
       )}
+      <ReservationConfirmationModal
+        open={open}
+        setOpen={setOpen}
+        startTime={startTime!}
+        endTime={endTime!}
+        resType={resType!}
+      />
     </div>
   );
 }
