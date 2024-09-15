@@ -34,13 +34,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     fetchSession();
 
-    const { data: listener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log(`SUPABSE AUTH EVENT ${event}`);
-        setSession(session);
-        setLoading(false);
-      },
-    );
+    const { data: listener } = supabase.auth.onAuthStateChange((_, session) => {
+      setSession(session);
+      setLoading(false);
+    });
 
     return () => {
       listener?.subscription.unsubscribe();
