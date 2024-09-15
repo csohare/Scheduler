@@ -9,7 +9,7 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-//import { fetchCheckoutSession } from "../api/checkoutSessionQuery";
+import { fetchCheckoutSession } from "../api/checkoutSessionQuery";
 
 type reservationConfirmationModalProps = {
   open: boolean;
@@ -46,7 +46,6 @@ export default function ReservationConfirmationModal({
 
   const createReservation = () => {
     setLoading(true);
-    /*
     fetchCheckoutSession(startTime!, endTime, resType)
       .then((data) => {
         window.location.href = data.url;
@@ -59,15 +58,21 @@ export default function ReservationConfirmationModal({
           window.location.pathname +
           "?success=overlap";
       });
-    */
   };
   return (
     <Modal
       open={open}
-      onClose={() => {
+      onClose={(_, reason) => {
+        if (
+          loading &&
+          (reason === "backdropClick" || reason === "escapeKeyDown")
+        ) {
+          return;
+        }
         setLoading(false);
         setOpen(false);
       }}
+      disableEscapeKeyDown={loading}
       closeAfterTransition
       slots={{ backdrop: Backdrop }}
       slotProps={{
@@ -82,7 +87,9 @@ export default function ReservationConfirmationModal({
             justifyItems="center"
             alignItems="center"
           >
-            <Typography variant="h6">Confirm Reservation</Typography>
+            <Typography variant="h5" sx={{ marginBottom: 2 }}>
+              Confirm Reservation
+            </Typography>
             <Typography variant="h6">
               {startTime?.toDateString() +
                 " " +

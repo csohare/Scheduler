@@ -140,7 +140,7 @@ export default function HomePage() {
 
   const alertMessage = (
     <Alert
-      className="mx-3"
+      className="mx-3 mt-4"
       severity={success ? "success" : "error"}
       onClose={() => {
         setMessage("");
@@ -151,7 +151,7 @@ export default function HomePage() {
   );
 
   return (
-    <div className="container flex flex-col mx-auto mt-1 h-screen justify-start align-middle">
+    <div className="container flex flex-col mx-auto mt-1 h-screen justify-start align-middle overflow-x-clip">
       {loading ? (
         <div className="flex h-full justify-center">
           <div className="my-auto scale-150">
@@ -337,7 +337,12 @@ export default function HomePage() {
                   },
                 }}
               >
-                <Button variant="contained" type="submit" size="large">
+                <Button
+                  variant="contained"
+                  type="submit"
+                  size="large"
+                  disabled={!endTime ? true : false}
+                >
                   Create Reservation
                 </Button>
               </Box>
