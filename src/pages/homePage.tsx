@@ -4,7 +4,7 @@ import findHalfIntervals from "../util/halfCourtIntervals";
 import allowedTimes from "../util/allowedTimes";
 import { fetchReservations } from "../api/reservationQuery";
 import { availableEnd } from "../util/allowedTimes";
-import { ScheduleMeeting } from "react-schedule-meeting";
+import { ScheduleMeeting } from "../components/ScheduleMeeting/ScheduleMeeting";
 import { AvailableTimeslot, StartTimeEvent } from "react-schedule-meeting";
 import { useNavigate } from "react-router-dom";
 import {
